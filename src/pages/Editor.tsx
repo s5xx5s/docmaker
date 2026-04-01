@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2 } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2, Palette } from 'lucide-react';
 import { useProjectStore } from '../store/project.store';
 import { useThemeStore } from '../store/theme.store';
 import { SectionList, makeSectionFromTitle } from '../components/editor/SectionList';
 import { BlockList } from '../components/editor/BlockList';
 import { GuidePreview } from '../components/preview/GuidePreview';
-import type { Block, Guide, Section } from '../types';
+import { ThemePicker } from '../components/theme/ThemePicker';
+import { ThemeCustomizer } from '../components/theme/ThemeCustomizer';
+import type { Block, Guide, Section, Theme } from '../types';
 import { generateId } from '../utils/id';
 
 type SaveStatus = 'saved' | 'saving' | 'unsaved';
@@ -39,6 +41,8 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
   const [device, setDevice] = useState<Device>('desktop');
 
   const theme = guide ? getTheme(guide.themeId) : getTheme('dark-navy');
+  const [themePickerOpen, setThemePickerOpen] = useState(false);
+  const [customizerTheme, setCustomizerTheme] = useState<Theme | null>(null);
 
   const activeSection = guide?.sections.find(s => s.id === activeSectionId) ?? null;
 
@@ -174,6 +178,9 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
             );
           })}
         </div>
+        <button onClick={() => setThemePickerOpen(true)} title="Theme" className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
+          <Palette size={14} /> Theme
+        </button>
         <button onClick={() => setPreviewVisible(v => !v)} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
           {previewVisible ? <EyeOff size={14} /> : <Eye size={14} />}
           {previewVisible ? 'Hide' : 'Preview'}
@@ -241,6 +248,25 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
           </div>
         )}
       </div>
+
+      {/* Theme Picker Modal */}
+      {themePickerOpen && (
+        <ThemePicker
+          selectedThemeId={guide.themeId}
+          onSelect={(id) => { mutate(g => ({ ...g, themeId: id })); setThemePickerOpen(false); }}
+          onClose={() => setThemePickerOpen(false)}
+          onCustomize={(t) => { setCustomizerTheme(t); setThemePickerOpen(false); }}
+        />
+      )}
+
+      {/* Theme Customizer Modal */}
+      {customizerTheme && (
+        <ThemeCustomizer
+          theme={customizerTheme}
+          onApply={(id) => mutate(g => ({ ...g, themeId: id }))}
+          onClose={() => setCustomizerTheme(null)}
+        />
+      )}
     </div>
   );
 }
