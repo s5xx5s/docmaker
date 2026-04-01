@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Plus, Search, Upload, BookOpen } from 'lucide-react';
+import { Plus, Search, Upload, BookOpen, Settings } from 'lucide-react';
 import { useProjectStore } from '../store/project.store';
 import { ProjectCard } from '../components/project/ProjectCard';
 import { ProjectModal } from '../components/project/ProjectModal';
@@ -8,9 +8,10 @@ import { importProjectsJSON } from '../utils/storage';
 
 interface Props {
   onOpenProject(projectId: string): void;
+  onSettings?(): void;
 }
 
-export function Home({ onOpenProject }: Props) {
+export function Home({ onOpenProject, onSettings }: Props) {
   const { projects, addProject, updateProject, deleteProject, duplicateProject, importProject } = useProjectStore();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -71,6 +72,11 @@ export function Home({ onOpenProject }: Props) {
             <Plus size={15} />
             New Project
           </button>
+          {onSettings && (
+            <button onClick={onSettings} className="text-gray-400 hover:text-white p-2 rounded-lg border border-gray-800 hover:border-gray-600 transition-colors" title="Settings">
+              <Settings size={15} />
+            </button>
+          )}
         </div>
       </nav>
 

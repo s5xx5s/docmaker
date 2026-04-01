@@ -53,6 +53,7 @@ export default function App() {
   return (
     <Home
       onOpenProject={(projectId) => setRoute({ page: 'project', projectId })}
+      onSettings={() => setRoute({ page: 'settings' })}
     />
   );
 }
