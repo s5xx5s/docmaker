@@ -1,0 +1,151 @@
+{
+  "id": "example-customer-guide",
+  "title": "Customer Getting Started Guide",
+  "subtitle": "Everything you need to know about your smart box",
+  "themeId": "arctic",
+  "defaultLang": "en",
+  "availableLangs": ["en", "ar"],
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "sections": [
+    {
+      "id": "sec-1",
+      "title": "Introduction",
+      "slug": "introduction",
+      "isActive": true,
+      "order": 0,
+      "blocks": [
+        {
+          "id": "b-1",
+          "type": "heading",
+          "content": "Welcome to Your Smart Delivery Box",
+          "level": 1,
+          "align": "center"
+        },
+        {
+          "id": "b-2",
+          "type": "text",
+          "content": "Your smart delivery box lets you receive shipments securely, even when you're not home. Couriers deposit packages into your box, and you retrieve them at your convenience.",
+          "align": "center"
+        },
+        {
+          "id": "b-3",
+          "type": "cards",
+          "items": [
+            { "title": "Secure", "description": "Packages are locked inside until you open the box", "icon": "🔒" },
+            { "title": "Tracked", "description": "Get notified the moment a delivery is made", "icon": "📱" },
+            { "title": "Convenient", "description": "Receive deliveries 24/7 without being home", "icon": "🏠" }
+          ]
+        }
+      ],
+      "translations": {
+        "ar": {
+          "title": "مقدمة",
+          "blocks": [
+            {
+              "id": "b-1",
+              "type": "heading",
+              "content": "مرحباً بك في صندوق التوصيل الذكي",
+              "level": 1,
+              "align": "center"
+            },
+            {
+              "id": "b-2",
+              "type": "text",
+              "content": "يتيح لك صندوق التوصيل الذكي استقبال الشحنات بأمان حتى عندما لا تكون في المنزل. يودع المناديب الطرود في صندوقك، وتستردها في وقت مناسب لك.",
+              "align": "center"
+            },
+            {
+              "id": "b-3",
+              "type": "cards",
+              "items": [
+                { "title": "آمن", "description": "الطرود مقفلة داخل الصندوق حتى تفتحه أنت", "icon": "🔒" },
+                { "title": "متابَع", "description": "احصل على إشعار فور إتمام التسليم", "icon": "📱" },
+                { "title": "مريح", "description": "استقبل التوصيلات على مدار الساعة دون الحاجة للتواجد", "icon": "🏠" }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sec-2",
+      "title": "Linking Your Box",
+      "slug": "linking-your-box",
+      "isActive": true,
+      "order": 1,
+      "blocks": [
+        {
+          "id": "b-4",
+          "type": "heading",
+          "content": "Linking Your Box",
+          "level": 2,
+          "align": "left"
+        },
+        {
+          "id": "b-5",
+          "type": "steps",
+          "items": [
+            { "title": "Open the app", "description": "Download and install the app, then sign in with your account." },
+            { "title": "Go to My Box", "description": "Tap the 'My Account' tab and select 'Link a Box'." },
+            { "title": "Enter the box ID", "description": "Enter the box ID printed on the label inside your box lid (format: SPC-XXXX-XXX)." },
+            { "title": "Confirm location", "description": "Allow location access so the app can verify you're near the box." }
+          ]
+        }
+      ],
+      "translations": {
+        "ar": {
+          "title": "ربط الصندوق",
+          "blocks": [
+            {
+              "id": "b-4",
+              "type": "heading",
+              "content": "ربط صندوقك",
+              "level": 2,
+              "align": "left"
+            },
+            {
+              "id": "b-5",
+              "type": "steps",
+              "items": [
+                { "title": "افتح التطبيق", "description": "حمّل التطبيق وثبّته، ثم سجّل الدخول بحسابك." },
+                { "title": "اذهب إلى صندوقي", "description": "اضغط على تبويب 'حسابي' واختر 'ربط صندوق'." },
+                { "title": "أدخل معرّف الصندوق", "description": "أدخل معرّف الصندوق المطبوع على الملصق داخل غطاء الصندوق (الصيغة: SPC-XXXX-XXX)." },
+                { "title": "أكّد الموقع", "description": "اسمح بالوصول إلى الموقع حتى يتحقق التطبيق من أنك بالقرب من الصندوق." }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sec-3",
+      "title": "Receiving a Shipment",
+      "slug": "receiving-a-shipment",
+      "isActive": true,
+      "order": 2,
+      "blocks": [
+        {
+          "id": "b-6",
+          "type": "heading",
+          "content": "Receiving a Shipment",
+          "level": 2,
+          "align": "left"
+        },
+        {
+          "id": "b-7",
+          "type": "text",
+          "content": "When a courier makes a delivery, you'll receive a push notification. The shipment will appear in your Shipments list.",
+          "align": "left"
+        },
+        {
+          "id": "b-8",
+          "type": "alert",
+          "content": "To open your box, go to the shipment detail and tap 'Open Box'. You must be within 100 meters of the box.",
+          "variant": "info"
+        }
+      ],
+      "translations": {}
+    }
+  ]
+}

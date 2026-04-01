@@ -1,0 +1,130 @@
+{
+  "id": "example-courier-guide",
+  "title": "Courier Operations Guide",
+  "subtitle": "Step-by-step delivery workflow",
+  "themeId": "dark-navy",
+  "defaultLang": "en",
+  "availableLangs": ["en"],
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "sections": [
+    {
+      "id": "sec-1",
+      "title": "Getting Started",
+      "slug": "getting-started",
+      "isActive": true,
+      "order": 0,
+      "blocks": [
+        {
+          "id": "b-1",
+          "type": "heading",
+          "content": "Welcome, Courier",
+          "level": 1,
+          "align": "left"
+        },
+        {
+          "id": "b-2",
+          "type": "text",
+          "content": "This guide walks you through the complete delivery workflow — from picking up a shipment to completing the delivery and recording proof.",
+          "align": "left"
+        },
+        {
+          "id": "b-3",
+          "type": "alert",
+          "content": "Always verify your identity in the app before starting your shift.",
+          "variant": "warning"
+        }
+      ],
+      "translations": {}
+    },
+    {
+      "id": "sec-2",
+      "title": "Pickup Process",
+      "slug": "pickup-process",
+      "isActive": true,
+      "order": 1,
+      "blocks": [
+        {
+          "id": "b-4",
+          "type": "heading",
+          "content": "Pickup Process",
+          "level": 2,
+          "align": "left"
+        },
+        {
+          "id": "b-5",
+          "type": "steps",
+          "items": [
+            { "title": "Check your assigned shipments", "description": "Open the app and review today's delivery list in the Shipments tab." },
+            { "title": "Arrive at the pickup location", "description": "Navigate to the sender's address. Enable location services for geofence verification." },
+            { "title": "Scan or enter the tracking number", "description": "Use the QR scanner or type the tracking number manually." },
+            { "title": "Record proof of pickup", "description": "Take a photo or short video of the package before loading it." }
+          ]
+        }
+      ],
+      "translations": {}
+    },
+    {
+      "id": "sec-3",
+      "title": "Delivery",
+      "slug": "delivery",
+      "isActive": true,
+      "order": 2,
+      "blocks": [
+        {
+          "id": "b-6",
+          "type": "heading",
+          "content": "Completing the Delivery",
+          "level": 2,
+          "align": "left"
+        },
+        {
+          "id": "b-7",
+          "type": "steps",
+          "items": [
+            { "title": "Navigate to the delivery address", "description": "Use the map link in the shipment details." },
+            { "title": "Arrive within geofence", "description": "You must be within 100 meters of the box location for delivery to be accepted." },
+            { "title": "Upload delivery proof", "description": "Record a short video or take a photo of the package being placed in the box." },
+            { "title": "Enter the door code", "description": "After the proof is accepted, the delivery code will appear. Enter it to open the box." },
+            { "title": "Confirm delivery", "description": "Mark the shipment as delivered in the app." }
+          ]
+        },
+        {
+          "id": "b-8",
+          "type": "callout",
+          "label": "Important",
+          "content": "The delivery code only appears after your proof video/photo is successfully uploaded. Do not skip the upload step.",
+          "variant": "warning"
+        }
+      ],
+      "translations": {}
+    },
+    {
+      "id": "sec-4",
+      "title": "FAQ",
+      "slug": "faq",
+      "isActive": true,
+      "order": 3,
+      "blocks": [
+        {
+          "id": "b-9",
+          "type": "heading",
+          "content": "Frequently Asked Questions",
+          "level": 2,
+          "align": "left"
+        },
+        {
+          "id": "b-10",
+          "type": "faq",
+          "items": [
+            { "question": "What if the box door doesn't open?", "answer": "Wait 30 seconds and try again. If it still doesn't work, contact support via the floating button in the app." },
+            { "question": "What if I can't reach the geofence?", "answer": "Make sure GPS is enabled. If the location is genuinely incorrect, take a photo of the address and contact support." },
+            { "question": "Can I leave the package outside the box?", "answer": "No. All deliveries must go inside the box. If the box is full, mark the shipment as failed and contact support." },
+            { "question": "What is an oversized shipment?", "answer": "A shipment too large for the upper slot. It goes through the lower door, which requires a separate passcode." }
+          ]
+        }
+      ],
+      "translations": {}
+    }
+  ]
+}
