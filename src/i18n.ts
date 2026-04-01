@@ -1,0 +1,117 @@
+import { useSettingsStore } from './store/settings.store';
+
+const T = {
+  en: {
+    // Home
+    projects: 'Projects',
+    newProject: 'New Project',
+    import: 'Import',
+    settings: 'Settings',
+    searchProjects: 'Search projects...',
+    noProjectsYet: 'No projects yet',
+    noProjectsFound: 'No projects found',
+    createFirstProject: 'Create your first project to get started',
+    tryDifferentSearch: 'Try a different search term',
+    createProject: 'Create Project',
+    deleteProject: 'Delete Project?',
+    deleteProjectConfirm: 'This will permanently delete the project and all its guides.',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    // ProjectPage
+    guides: 'Guides',
+    newGuide: 'New Guide',
+    noGuidesYet: 'No guides yet',
+    createFirstGuide: 'Create your first guide',
+    // Editor
+    save: 'Save',
+    saved: '● Saved',
+    saving: '◌ Saving...',
+    unsaved: '⚠ Unsaved',
+    translate: 'Translate',
+    theme: 'Theme',
+    preview: 'Preview',
+    hidePreview: 'Hide',
+    export: 'Export',
+    subtitle: 'Subtitle...',
+    addSection: 'Add Section',
+    addBlock: 'Add Block',
+    blocks: 'Blocks',
+    sections: 'Sections',
+    // Settings
+    interfaceLanguage: 'Interface Language',
+    autoSave: 'Auto-save Interval',
+    defaultTheme: 'Default Theme',
+    defaultGuideLang: 'Default Guide Language',
+    storageData: 'Storage & Data',
+    exportAll: 'Export All Data',
+    clearAll: 'Clear All Data',
+    downloadBackup: 'Download Backup',
+    about: 'About',
+    version: 'Version',
+    // Guide
+    direction: 'Direction',
+    ltr: 'LTR →',
+    rtl: '← RTL',
+    logo: 'Logo',
+  },
+  ar: {
+    // Home
+    projects: 'المشاريع',
+    newProject: 'مشروع جديد',
+    import: 'استيراد',
+    settings: 'الإعدادات',
+    searchProjects: 'ابحث عن مشروع...',
+    noProjectsYet: 'لا توجد مشاريع بعد',
+    noProjectsFound: 'لم يُعثر على مشاريع',
+    createFirstProject: 'أنشئ مشروعك الأول للبدء',
+    tryDifferentSearch: 'جرّب كلمة بحث مختلفة',
+    createProject: 'إنشاء مشروع',
+    deleteProject: 'حذف المشروع؟',
+    deleteProjectConfirm: 'سيُحذف المشروع وجميع أدلته نهائياً.',
+    cancel: 'إلغاء',
+    delete: 'حذف',
+    // ProjectPage
+    guides: 'الأدلة',
+    newGuide: 'دليل جديد',
+    noGuidesYet: 'لا توجد أدلة بعد',
+    createFirstGuide: 'أنشئ دليلك الأول',
+    // Editor
+    save: 'حفظ',
+    saved: '● محفوظ',
+    saving: '◌ جاري الحفظ...',
+    unsaved: '⚠ غير محفوظ',
+    translate: 'ترجمة',
+    theme: 'ثيم',
+    preview: 'معاينة',
+    hidePreview: 'إخفاء',
+    export: 'تصدير',
+    subtitle: 'العنوان الفرعي...',
+    addSection: 'إضافة قسم',
+    addBlock: 'إضافة بلوك',
+    blocks: 'البلوكات',
+    sections: 'الأقسام',
+    // Settings
+    interfaceLanguage: 'لغة الواجهة',
+    autoSave: 'فترة الحفظ التلقائي',
+    defaultTheme: 'الثيم الافتراضي',
+    defaultGuideLang: 'لغة الدليل الافتراضية',
+    storageData: 'التخزين والبيانات',
+    exportAll: 'تصدير جميع البيانات',
+    clearAll: 'مسح جميع البيانات',
+    downloadBackup: 'تنزيل نسخة احتياطية',
+    about: 'حول التطبيق',
+    version: 'الإصدار',
+    // Guide
+    direction: 'الاتجاه',
+    ltr: 'يسار → يمين',
+    rtl: 'يمين ← يسار',
+    logo: 'شعار',
+  },
+} as const;
+
+export type TranslationKey = keyof typeof T.en;
+
+export function useT() {
+  const lang = useSettingsStore(s => s.settings.uiLang);
+  return (key: TranslationKey): string => T[lang][key] ?? T.en[key];
+}

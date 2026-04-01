@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2, Palette, Languages, Download } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2, Palette, Languages, Download, AlignLeft, AlignRight } from 'lucide-react';
 import { useProjectStore } from '../store/project.store';
 import { useThemeStore } from '../store/theme.store';
 import { SectionList, makeSectionFromTitle } from '../components/editor/SectionList';
@@ -11,6 +11,7 @@ import { TranslationPanel } from '../components/translation/TranslationPanel';
 import { ExportPanel } from '../components/export/ExportPanel';
 import type { Block, Guide, Section, Theme } from '../types';
 import { generateId } from '../utils/id';
+import { useT } from '../i18n';
 
 type SaveStatus = 'saved' | 'saving' | 'unsaved';
 type Device = 'desktop' | 'tablet' | 'mobile';
@@ -48,6 +49,8 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
   const [translationOpen, setTranslationOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
 
+  const t = useT();
+
   const activeSection = guide?.sections.find(s => s.id === activeSectionId) ?? null;
 
   // Auto-save every 3 seconds when unsaved
@@ -60,6 +63,8 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
       themeId:        g.themeId,
       availableLangs: g.availableLangs,
       defaultLang:    g.defaultLang,
+      direction:      g.direction,
+      logo:           g.logo,
     });
     setTimeout(() => setSaveStatus('saved'), 500);
   }, [projectId, guideId, updateGuide]);
@@ -67,8 +72,8 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
   useEffect(() => {
     if (saveStatus !== 'unsaved' || !guide) return;
     const currentGuide = guide;
-    const t = setTimeout(() => persist(currentGuide), 2000);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => persist(currentGuide), 2000);
+    return () => clearTimeout(timer);
   }, [saveStatus, guide, persist]);
 
   if (!guide) return (
@@ -153,7 +158,7 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
   }
 
   // ── Save status label ────────────────────────────────────────────────────────
-  const statusLabel = saveStatus === 'saved' ? '● Saved' : saveStatus === 'saving' ? '◌ Saving...' : '⚠ Unsaved';
+  const statusLabel = saveStatus === 'saved' ? t('saved') : saveStatus === 'saving' ? t('saving') : t('unsaved');
   const statusColor = saveStatus === 'saved' ? 'text-green-400' : saveStatus === 'saving' ? 'text-yellow-400' : 'text-orange-400';
 
   return (
@@ -170,7 +175,7 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
           <input
             value={guide.subtitle ?? ''}
             onChange={e => mutate(g => ({ ...g, subtitle: e.target.value }))}
-            placeholder="Subtitle..."
+            placeholder={t('subtitle')}
             className="bg-transparent text-xs text-gray-500 focus:outline-none ml-3"
           />
         </div>
@@ -185,15 +190,23 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
             );
           })}
         </div>
-        <button onClick={() => setTranslationOpen(true)} title="Translate" className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
-          <Languages size={14} /> Translate
+        <button
+          onClick={() => mutate(g => ({ ...g, direction: g.direction === 'rtl' ? 'ltr' : 'rtl' }))}
+          title={t('direction')}
+          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5"
+        >
+          {guide.direction === 'rtl' ? <AlignLeft size={14} /> : <AlignRight size={14} />}
+          {guide.direction === 'rtl' ? t('ltr') : t('rtl')}
         </button>
-        <button onClick={() => setThemePickerOpen(true)} title="Theme" className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
-          <Palette size={14} /> Theme
+        <button onClick={() => setTranslationOpen(true)} title={t('translate')} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
+          <Languages size={14} /> {t('translate')}
+        </button>
+        <button onClick={() => setThemePickerOpen(true)} title={t('theme')} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
+          <Palette size={14} /> {t('theme')}
         </button>
         <button onClick={() => setPreviewVisible(v => !v)} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
           {previewVisible ? <EyeOff size={14} /> : <Eye size={14} />}
-          {previewVisible ? 'Hide' : 'Preview'}
+          {previewVisible ? t('hidePreview') : t('preview')}
         </button>
         {onFullPreview && (
           <button onClick={onFullPreview} title="Full Screen Preview" className="text-gray-400 hover:text-white border border-gray-700 rounded-lg p-1.5">
@@ -201,10 +214,10 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
           </button>
         )}
         <button onClick={() => setExportOpen(true)} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
-          <Download size={14} /> Export
+          <Download size={14} /> {t('export')}
         </button>
         <button onClick={() => persist(guide)} className="flex items-center gap-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-1.5 font-semibold">
-          <Save size={13} /> Save
+          <Save size={13} /> {t('save')}
         </button>
       </nav>
 
@@ -225,7 +238,7 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
         </div>
 
         {/* Blocks panel */}
-        <div className="w-80 border-r border-gray-800 shrink-0 overflow-hidden flex flex-col">
+        <div className={`${previewVisible ? 'w-80 shrink-0' : 'flex-1'} border-r border-gray-800 overflow-hidden flex flex-col`}>
           {activeSection ? (
             <BlockList
               blocks={activeSection.blocks}
@@ -282,7 +295,7 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
           selectedThemeId={guide.themeId}
           onSelect={(id) => { mutate(g => ({ ...g, themeId: id })); setThemePickerOpen(false); }}
           onClose={() => setThemePickerOpen(false)}
-          onCustomize={(t) => { setCustomizerTheme(t); setThemePickerOpen(false); }}
+          onCustomize={(th) => { setCustomizerTheme(th); setThemePickerOpen(false); }}
         />
       )}
 

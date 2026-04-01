@@ -16,9 +16,14 @@ export function ButtonBlock({ block, onUpdate, isEditing }: Props) {
   if (!isEditing) {
     return (
       <div className={`flex ${alignClass}`}>
-        <span className={`rounded-lg font-semibold transition-colors cursor-pointer ${VARIANT_STYLES[block.variant ?? 'primary']} ${SIZE_STYLES[block.size ?? 'md']}`}>
+        <a
+          href={block.href || '#'}
+          target={block.href && block.href !== '#' ? '_blank' : undefined}
+          rel="noopener noreferrer"
+          className={`rounded-lg font-semibold transition-colors inline-block ${VARIANT_STYLES[block.variant ?? 'primary']} ${SIZE_STYLES[block.size ?? 'md']}`}
+        >
           {block.label || 'Button'}
-        </span>
+        </a>
       </div>
     );
   }
@@ -26,13 +31,19 @@ export function ButtonBlock({ block, onUpdate, isEditing }: Props) {
   return (
     <div className="space-y-2">
       <div className={`flex ${alignClass}`}>
-        <span className={`rounded-lg font-semibold transition-colors cursor-pointer ${VARIANT_STYLES[block.variant ?? 'primary']} ${SIZE_STYLES[block.size ?? 'md']}`}>
+        <a
+          href={block.href || '#'}
+          target={block.href && block.href !== '#' ? '_blank' : undefined}
+          rel="noopener noreferrer"
+          className={`rounded-lg font-semibold transition-colors inline-block ${VARIANT_STYLES[block.variant ?? 'primary']} ${SIZE_STYLES[block.size ?? 'md']}`}
+          onClick={e => e.preventDefault()}
+        >
           {block.label || 'Button'}
-        </span>
+        </a>
       </div>
       <div className="grid grid-cols-2 gap-2">
         <input value={block.label} onChange={e => onUpdate({ label: e.target.value })} placeholder="Button text" className="bg-gray-800 text-xs text-white rounded px-2 py-1 border border-gray-700 focus:outline-none focus:border-blue-500" />
-        <input value={block.href ?? ''} onChange={e => onUpdate({ href: e.target.value })} placeholder="Link URL" className="bg-gray-800 text-xs text-gray-300 rounded px-2 py-1 border border-gray-700 focus:outline-none" />
+        <input value={block.href ?? ''} onChange={e => onUpdate({ href: e.target.value })} placeholder="https://..." className="bg-gray-800 text-xs text-gray-300 rounded px-2 py-1 border border-gray-700 focus:outline-none" />
       </div>
       <div className="flex gap-2 text-xs">
         {(['primary','secondary','outline','ghost'] as const).map(v => <button key={v} onClick={() => onUpdate({ variant: v })} className={`px-2 py-0.5 rounded ${block.variant === v ? 'bg-blue-700 text-white' : 'text-gray-500'}`}>{v}</button>)}

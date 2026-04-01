@@ -84,7 +84,7 @@ export function GuidePreview({ guide, theme, activeSectionId, onSectionChange, m
     : 'flex h-full overflow-hidden rounded-xl border';
 
   return (
-    <div className={containerClass} style={themeToStyle(theme)}>
+    <div className={containerClass} style={themeToStyle(theme)} dir={guide.direction ?? 'ltr'}>
 
       {/* ── Sidebar nav ─────────────────────────────────────────────── */}
       {sections.length > 1 && (
@@ -94,6 +94,9 @@ export function GuidePreview({ guide, theme, activeSectionId, onSectionChange, m
         >
           {/* Guide title */}
           <div className="px-4 py-5 border-b" style={{ borderColor: 'var(--gp-border)' }}>
+            {guide.logo && (
+              <img src={guide.logo} alt="Logo" className="h-8 mb-3 object-contain" />
+            )}
             <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--gp-muted)' }}>
               {guide.subtitle ? guide.subtitle : 'Guide'}
             </p>
@@ -158,6 +161,9 @@ export function GuidePreview({ guide, theme, activeSectionId, onSectionChange, m
         {/* Guide header (only when single section / no sidebar) */}
         {sections.length <= 1 && (
           <header className="mb-8">
+            {guide.logo && (
+              <img src={guide.logo} alt="Logo" className="h-12 mb-4 object-contain" />
+            )}
             <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--gp-text)', fontFamily: 'var(--gp-font-head), sans-serif' }}>
               {guide.title}
             </h1>

@@ -28,6 +28,8 @@ export interface Guide {
   projectId: string;
   title: string;
   subtitle?: string;
+  direction?: 'ltr' | 'rtl';
+  logo?: string;
   themeId: string;
   themeOverrides?: Partial<Theme>;
   defaultLang: string;

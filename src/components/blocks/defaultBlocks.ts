@@ -3,7 +3,7 @@ import type { BlockType } from '../../types';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getDefaultBlock(type: BlockType): any {
   switch (type) {
-    case 'text':        return { type, content: 'Write your text here...', align: 'left' };
+    case 'text':        return { type, content: '', align: 'left' };
     case 'highlight':   return { type, variant: 'info', title: 'Note', content: 'Add your note here.' };
     case 'steps':       return { type, steps: [{ title: 'Step 1', description: 'Describe this step' }, { title: 'Step 2', description: '' }] };
     case 'cards':       return { type, columns: 3, cards: [{ title: 'Card 1', description: 'Description', icon: '⭐' }, { title: 'Card 2', description: 'Description', icon: '🚀' }] };
