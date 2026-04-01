@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2, Palette, Languages } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2, Palette, Languages, Download } from 'lucide-react';
 import { useProjectStore } from '../store/project.store';
 import { useThemeStore } from '../store/theme.store';
 import { SectionList, makeSectionFromTitle } from '../components/editor/SectionList';
@@ -8,6 +8,7 @@ import { GuidePreview } from '../components/preview/GuidePreview';
 import { ThemePicker } from '../components/theme/ThemePicker';
 import { ThemeCustomizer } from '../components/theme/ThemeCustomizer';
 import { TranslationPanel } from '../components/translation/TranslationPanel';
+import { ExportPanel } from '../components/export/ExportPanel';
 import type { Block, Guide, Section, Theme } from '../types';
 import { generateId } from '../utils/id';
 
@@ -45,6 +46,7 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
   const [themePickerOpen, setThemePickerOpen] = useState(false);
   const [customizerTheme, setCustomizerTheme] = useState<Theme | null>(null);
   const [translationOpen, setTranslationOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const activeSection = guide?.sections.find(s => s.id === activeSectionId) ?? null;
 
@@ -198,6 +200,9 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
             <Maximize2 size={14} />
           </button>
         )}
+        <button onClick={() => setExportOpen(true)} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
+          <Download size={14} /> Export
+        </button>
         <button onClick={() => persist(guide)} className="flex items-center gap-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-1.5 font-semibold">
           <Save size={13} /> Save
         </button>
@@ -256,6 +261,11 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
           </div>
         )}
       </div>
+
+      {/* Export Panel */}
+      {exportOpen && (
+        <ExportPanel guide={guide} theme={theme} onClose={() => setExportOpen(false)} />
+      )}
 
       {/* Translation Panel */}
       {translationOpen && (
