@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2, Palette } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2, Palette, Languages } from 'lucide-react';
 import { useProjectStore } from '../store/project.store';
 import { useThemeStore } from '../store/theme.store';
 import { SectionList, makeSectionFromTitle } from '../components/editor/SectionList';
@@ -7,6 +7,7 @@ import { BlockList } from '../components/editor/BlockList';
 import { GuidePreview } from '../components/preview/GuidePreview';
 import { ThemePicker } from '../components/theme/ThemePicker';
 import { ThemeCustomizer } from '../components/theme/ThemeCustomizer';
+import { TranslationPanel } from '../components/translation/TranslationPanel';
 import type { Block, Guide, Section, Theme } from '../types';
 import { generateId } from '../utils/id';
 
@@ -43,6 +44,7 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
   const theme = guide ? getTheme(guide.themeId) : getTheme('dark-navy');
   const [themePickerOpen, setThemePickerOpen] = useState(false);
   const [customizerTheme, setCustomizerTheme] = useState<Theme | null>(null);
+  const [translationOpen, setTranslationOpen] = useState(false);
 
   const activeSection = guide?.sections.find(s => s.id === activeSectionId) ?? null;
 
@@ -50,9 +52,12 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
   const persist = useCallback((g: Guide) => {
     setSaveStatus('saving');
     updateGuide(projectId, guideId, {
-      title: g.title,
-      subtitle: g.subtitle,
-      sections: g.sections,
+      title:          g.title,
+      subtitle:       g.subtitle,
+      sections:       g.sections,
+      themeId:        g.themeId,
+      availableLangs: g.availableLangs,
+      defaultLang:    g.defaultLang,
     });
     setTimeout(() => setSaveStatus('saved'), 500);
   }, [projectId, guideId, updateGuide]);
@@ -178,6 +183,9 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
             );
           })}
         </div>
+        <button onClick={() => setTranslationOpen(true)} title="Translate" className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
+          <Languages size={14} /> Translate
+        </button>
         <button onClick={() => setThemePickerOpen(true)} title="Theme" className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
           <Palette size={14} /> Theme
         </button>
@@ -248,6 +256,15 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
           </div>
         )}
       </div>
+
+      {/* Translation Panel */}
+      {translationOpen && (
+        <TranslationPanel
+          guide={guide}
+          onClose={() => setTranslationOpen(false)}
+          onUpdateGuide={(patch) => mutate(g => ({ ...g, ...patch }))}
+        />
+      )}
 
       {/* Theme Picker Modal */}
       {themePickerOpen && (
