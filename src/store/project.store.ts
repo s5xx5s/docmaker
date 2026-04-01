@@ -17,7 +17,7 @@ interface ProjectStore {
 
   // Guides CRUD
   addGuide(projectId: string, title: string): Guide;
-  updateGuide(projectId: string, guideId: string, patch: Partial<Omit<Guide, 'id' | 'projectId' | 'sections'>>): void;
+  updateGuide(projectId: string, guideId: string, patch: Partial<Omit<Guide, 'id' | 'projectId'>>): void;
   deleteGuide(projectId: string, guideId: string): void;
 
   // Sections
