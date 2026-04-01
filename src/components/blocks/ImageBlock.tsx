@@ -5,12 +5,25 @@ import { imageToBase64 } from '../../utils/imageToBase64';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function ImageBlock({ block, onUpdate }: Props) {
+const WIDTH_CLASSES: Record<string, string> = { small: 'w-1/4', medium: 'w-1/2', large: 'w-3/4', full: 'w-full' };
+
+export function ImageBlock({ block, onUpdate, isEditing }: Props) {
   const ref = useRef<HTMLInputElement>(null);
   const upload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) onUpdate({ src: await imageToBase64(file) });
   };
+
+  if (!isEditing) {
+    if (!block.src) return null;
+    const widthClass = WIDTH_CLASSES[block.width ?? 'full'] ?? 'w-full';
+    return (
+      <figure className={`${widthClass}`}>
+        <img src={block.src} alt={block.alt} className="rounded-lg object-contain bg-gray-800 w-full" />
+        {block.caption && <figcaption className="text-xs text-center mt-1" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{block.caption}</figcaption>}
+      </figure>
+    );
+  }
 
   return (
     <div className="space-y-2">

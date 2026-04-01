@@ -4,7 +4,30 @@ const LANGS = ['javascript','typescript','python','bash','json','html','css','sq
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function CodeBlock({ block, onUpdate }: Props) {
+export function CodeBlock({ block, onUpdate, isEditing }: Props) {
+  if (!isEditing) {
+    return (
+      <div className="bg-gray-950 rounded-lg p-3 border border-gray-800">
+        {(block.filename || block.language) && (
+          <div className="flex items-center gap-2 mb-2">
+            {block.filename && <span className="text-xs text-gray-500 font-mono">{block.filename}</span>}
+            {block.language && <span className="text-xs text-gray-600 font-mono ml-auto">{block.language}</span>}
+          </div>
+        )}
+        <pre className="text-green-300 font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap">
+          {block.showLineNumbers
+            ? block.code.split('\n').map((line, i) => (
+                <span key={i} className="block">
+                  <span className="text-gray-600 select-none mr-3 text-right inline-block w-5">{i + 1}</span>{line}
+                </span>
+              ))
+            : block.code
+          }
+        </pre>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">

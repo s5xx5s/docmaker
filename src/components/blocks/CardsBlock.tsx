@@ -3,10 +3,25 @@ import type { CardsBlock as T } from '../../types';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function CardsBlock({ block, onUpdate }: Props) {
+export function CardsBlock({ block, onUpdate, isEditing }: Props) {
   const update = (i: number, patch: Partial<T['cards'][0]>) => onUpdate({ cards: block.cards.map((c, idx) => idx === i ? { ...c, ...patch } : c) });
   const add = () => onUpdate({ cards: [...block.cards, { title: 'New Card', description: '', icon: '⭐' }] });
   const remove = (i: number) => onUpdate({ cards: block.cards.filter((_, idx) => idx !== i) });
+
+  if (!isEditing) {
+    const cols = block.columns ?? 3;
+    return (
+      <div className={`grid grid-cols-${cols} gap-3`}>
+        {block.cards.map((card, i) => (
+          <div key={i} className="bg-gray-800 rounded-lg p-3 space-y-1">
+            {card.icon && <div className="text-2xl">{card.icon}</div>}
+            <p className="text-sm font-medium" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{card.title}</p>
+            {card.description && <p className="text-xs" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{card.description}</p>}
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div>

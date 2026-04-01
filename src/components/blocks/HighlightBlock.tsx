@@ -5,7 +5,18 @@ const ICONS = { info: 'ℹ️', warning: '⚠️', success: '✅', danger: '🚨
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function HighlightBlock({ block, onUpdate }: Props) {
+export function HighlightBlock({ block, onUpdate, isEditing }: Props) {
+  if (!isEditing) {
+    return (
+      <div className={`border-l-4 rounded-r-lg p-3 ${COLORS[block.variant]}`}>
+        <div className="flex items-center gap-2 mb-1">
+          <span>{ICONS[block.variant]}</span>
+          {block.title && <span className="text-sm font-semibold" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{block.title}</span>}
+        </div>
+        <p className="text-sm" style={{ color: 'var(--gp-text-muted, #cbd5e1)' }}>{block.content}</p>
+      </div>
+    );
+  }
   return (
     <div className={`border-l-4 rounded-r-lg p-3 ${COLORS[block.variant]}`}>
       <div className="flex items-center gap-2 mb-1">

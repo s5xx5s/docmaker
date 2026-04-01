@@ -5,7 +5,7 @@ import { imageToBase64 } from '../../utils/imageToBase64';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function GalleryBlock({ block, onUpdate }: Props) {
+export function GalleryBlock({ block, onUpdate, isEditing }: Props) {
   const ref = useRef<HTMLInputElement>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const remove = (i: number) => onUpdate({ images: block.images.filter((_, idx) => idx !== i) });
@@ -15,6 +15,32 @@ export function GalleryBlock({ block, onUpdate }: Props) {
     onUpdate({ images: [...block.images, ...newImgs] });
     e.target.value = '';
   };
+
+  if (!isEditing) {
+    const cols = block.columns ?? 3;
+    return (
+      <>
+        <div className={`grid grid-cols-${cols} gap-2`}>
+          {block.images.map((img, i) => (
+            <div key={i} className="aspect-square">
+              <img
+                src={img.src}
+                alt={img.alt}
+                onClick={() => block.lightbox && setLightboxSrc(img.src)}
+                className={`w-full h-full object-cover rounded-lg ${block.lightbox ? 'cursor-pointer' : ''}`}
+              />
+            </div>
+          ))}
+        </div>
+        {lightboxSrc && (
+          <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onClick={() => setLightboxSrc(null)}>
+            <img src={lightboxSrc} className="max-w-full max-h-full rounded-lg" />
+            <button className="absolute top-4 right-4 text-white"><X size={24} /></button>
+          </div>
+        )}
+      </>
+    );
+  }
 
   return (
     <div className="space-y-2">

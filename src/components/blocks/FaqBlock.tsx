@@ -3,10 +3,29 @@ import type { FaqBlock as T } from '../../types';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function FaqBlock({ block, onUpdate }: Props) {
+export function FaqBlock({ block, onUpdate, isEditing }: Props) {
   const update = (i: number, patch: Partial<T['items'][0]>) => onUpdate({ items: block.items.map((x, idx) => idx === i ? { ...x, ...patch } : x) });
   const add = () => onUpdate({ items: [...block.items, { question: 'New Question?', answer: 'Answer here...' }] });
   const remove = (i: number) => onUpdate({ items: block.items.filter((_, idx) => idx !== i) });
+
+  if (!isEditing) {
+    return (
+      <div className="space-y-3">
+        {block.items.map((item, i) => (
+          <div key={i} className="border border-gray-700 rounded-lg p-3 space-y-1.5">
+            <div className="flex gap-2 items-start">
+              <span className="text-blue-400 font-bold text-sm shrink-0">Q</span>
+              <p className="text-sm font-medium" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{item.question}</p>
+            </div>
+            <div className="flex gap-2 items-start">
+              <span className="text-green-400 font-bold text-sm shrink-0">A</span>
+              <p className="text-sm" style={{ color: 'var(--gp-text-muted, #cbd5e1)' }}>{item.answer}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">

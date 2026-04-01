@@ -3,11 +3,35 @@ import type { CompareBlock as T } from '../../types';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function CompareBlock({ block, onUpdate }: Props) {
+export function CompareBlock({ block, onUpdate, isEditing }: Props) {
   const addLeft = () => onUpdate({ leftItems: [...block.leftItems, ''] });
   const addRight = () => onUpdate({ rightItems: [...block.rightItems, ''] });
   const updateLeft = (i: number, v: string) => onUpdate({ leftItems: block.leftItems.map((x, idx) => idx === i ? v : x) });
   const updateRight = (i: number, v: string) => onUpdate({ rightItems: block.rightItems.map((x, idx) => idx === i ? v : x) });
+
+  if (!isEditing) {
+    return (
+      <div className="grid grid-cols-2 gap-3">
+        {(['left','right'] as const).map(side => {
+          const items = side === 'left' ? block.leftItems : block.rightItems;
+          const title = side === 'left' ? block.leftTitle : block.rightTitle;
+          return (
+            <div key={side} className={`rounded-lg p-3 ${side === 'left' ? 'bg-green-950/20 border border-green-800/40' : 'bg-red-950/20 border border-red-800/40'}`}>
+              {title && <p className="text-sm font-bold mb-2" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{title}</p>}
+              <div className="space-y-1">
+                {items.map((item, i) => (
+                  <div key={i} className="flex gap-1.5 items-start">
+                    <span className="text-xs shrink-0">{side === 'left' ? '✅' : '❌'}</span>
+                    <span className="text-xs" style={{ color: 'var(--gp-text-muted, #cbd5e1)' }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-2 gap-3">

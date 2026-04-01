@@ -12,10 +12,26 @@ function getEmbedUrl(src: string): string | null {
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function VideoBlock({ block, onUpdate }: Props) {
+export function VideoBlock({ block, onUpdate, isEditing }: Props) {
   const ref = useRef<HTMLInputElement>(null);
   const embedUrl = block.src ? getEmbedUrl(block.src) : null;
   const isBase64 = block.src?.startsWith('data:');
+
+  if (!isEditing) {
+    if (!block.src) return null;
+    return (
+      <figure className="space-y-1">
+        {embedUrl ? (
+          <iframe src={embedUrl} className="w-full h-48 rounded-lg" allowFullScreen />
+        ) : isBase64 ? (
+          <video src={block.src} controls className="w-full rounded-lg" />
+        ) : (
+          <div className="w-full h-16 bg-gray-800 rounded-lg flex items-center justify-center text-gray-500 text-xs">{block.src}</div>
+        )}
+        {block.caption && <figcaption className="text-xs text-center" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{block.caption}</figcaption>}
+      </figure>
+    );
+  }
 
   return (
     <div className="space-y-2">

@@ -4,12 +4,23 @@ import { imageToBase64 } from '../../utils/imageToBase64';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function LogoBlock({ block, onUpdate }: Props) {
+export function LogoBlock({ block, onUpdate, isEditing }: Props) {
   const ref = useRef<HTMLInputElement>(null);
   const upload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) onUpdate({ src: await imageToBase64(file) });
   };
+
+  if (!isEditing) {
+    if (!block.src) return null;
+    const img = <img src={block.src} alt={block.alt} style={{ width: block.width ?? 120 }} className="object-contain" />;
+    return (
+      <div className="flex justify-center">
+        {block.link ? <a href={block.link} target="_blank" rel="noopener noreferrer">{img}</a> : img}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center gap-3">
       {block.src ? (

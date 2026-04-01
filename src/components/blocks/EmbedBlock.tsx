@@ -2,7 +2,16 @@ import type { EmbedBlock as T } from '../../types';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function EmbedBlock({ block, onUpdate }: Props) {
+export function EmbedBlock({ block, onUpdate, isEditing }: Props) {
+  if (!isEditing) {
+    if (!block.src) return null;
+    return (
+      <div className="rounded-lg overflow-hidden border border-gray-700">
+        <iframe src={block.src} title={block.title} height={block.height ?? 400} className="w-full" allowFullScreen />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <input value={block.src} onChange={e => onUpdate({ src: e.target.value })} placeholder="https://..." className="w-full bg-gray-800 text-xs text-gray-300 rounded px-2 py-1.5 border border-gray-700 focus:outline-none focus:border-blue-500" />

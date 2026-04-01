@@ -3,10 +3,28 @@ import type { StatsBlock as T } from '../../types';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function StatsBlock({ block, onUpdate }: Props) {
+export function StatsBlock({ block, onUpdate, isEditing }: Props) {
   const update = (i: number, patch: Partial<T['items'][0]>) => onUpdate({ items: block.items.map((x, idx) => idx === i ? { ...x, ...patch } : x) });
   const add = () => onUpdate({ items: [...block.items, { value: '0', label: 'Metric' }] });
   const remove = (i: number) => onUpdate({ items: block.items.filter((_, idx) => idx !== i) });
+
+  if (!isEditing) {
+    const cols = block.columns ?? 3;
+    return (
+      <div className={`grid grid-cols-${cols} gap-3`}>
+        {block.items.map((item, i) => (
+          <div key={i} className="bg-gray-800 rounded-xl p-3 text-center">
+            <div className="flex items-baseline justify-center gap-0.5">
+              {item.prefix && <span className="text-blue-400 text-sm font-bold">{item.prefix}</span>}
+              <span className="text-2xl font-bold" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{item.value}</span>
+              {item.suffix && <span className="text-blue-400 text-sm font-bold">{item.suffix}</span>}
+            </div>
+            <p className="text-xs mt-1" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{item.label}</p>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div>

@@ -4,13 +4,30 @@ import { imageToBase64 } from '../../utils/imageToBase64';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function ImageTextBlock({ block, onUpdate }: Props) {
+export function ImageTextBlock({ block, onUpdate, isEditing }: Props) {
   const ref = useRef<HTMLInputElement>(null);
   const upload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) onUpdate({ src: await imageToBase64(file) });
   };
   const isLeft = block.imagePosition !== 'right';
+
+  if (!isEditing) {
+    return (
+      <div className={`flex gap-3 ${isLeft ? '' : 'flex-row-reverse'}`}>
+        {block.src && (
+          <div className="w-1/3 shrink-0">
+            <img src={block.src} alt={block.alt} className="w-full rounded-lg h-28 object-cover" />
+          </div>
+        )}
+        <div className="flex-1 space-y-1">
+          {block.title && <p className="text-sm font-semibold" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{block.title}</p>}
+          <p className="text-xs leading-relaxed" style={{ color: 'var(--gp-text-muted, #cbd5e1)' }}>{block.content}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <div className={`flex gap-3 ${isLeft ? '' : 'flex-row-reverse'}`}>

@@ -10,8 +10,19 @@ const SIZE_STYLES = { sm: 'px-3 py-1.5 text-xs', md: 'px-5 py-2 text-sm', lg: 'p
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function ButtonBlock({ block, onUpdate }: Props) {
+export function ButtonBlock({ block, onUpdate, isEditing }: Props) {
   const alignClass = block.align === 'center' ? 'justify-center' : block.align === 'right' ? 'justify-end' : 'justify-start';
+
+  if (!isEditing) {
+    return (
+      <div className={`flex ${alignClass}`}>
+        <span className={`rounded-lg font-semibold transition-colors cursor-pointer ${VARIANT_STYLES[block.variant ?? 'primary']} ${SIZE_STYLES[block.size ?? 'md']}`}>
+          {block.label || 'Button'}
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <div className={`flex ${alignClass}`}>

@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2 } from 'lucide-react';
 import { useProjectStore } from '../store/project.store';
+import { useThemeStore } from '../store/theme.store';
 import { SectionList, makeSectionFromTitle } from '../components/editor/SectionList';
 import { BlockList } from '../components/editor/BlockList';
+import { GuidePreview } from '../components/preview/GuidePreview';
 import type { Block, Guide, Section } from '../types';
 import { generateId } from '../utils/id';
 
@@ -19,10 +21,12 @@ interface Props {
   projectId: string;
   guideId: string;
   onBack(): void;
+  onFullPreview?(): void;
 }
 
-export function Editor({ projectId, guideId, onBack }: Props) {
+export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
   const { projects, updateGuide } = useProjectStore();
+  const { getTheme } = useThemeStore();
   const project = projects.find(p => p.id === projectId);
   const guideFromStore = project?.guides.find(g => g.id === guideId);
 
@@ -33,6 +37,8 @@ export function Editor({ projectId, guideId, onBack }: Props) {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
   const [previewVisible, setPreviewVisible] = useState(true);
   const [device, setDevice] = useState<Device>('desktop');
+
+  const theme = guide ? getTheme(guide.themeId) : getTheme('dark-navy');
 
   const activeSection = guide?.sections.find(s => s.id === activeSectionId) ?? null;
 
@@ -172,6 +178,11 @@ export function Editor({ projectId, guideId, onBack }: Props) {
           {previewVisible ? <EyeOff size={14} /> : <Eye size={14} />}
           {previewVisible ? 'Hide' : 'Preview'}
         </button>
+        {onFullPreview && (
+          <button onClick={onFullPreview} title="Full Screen Preview" className="text-gray-400 hover:text-white border border-gray-700 rounded-lg p-1.5">
+            <Maximize2 size={14} />
+          </button>
+        )}
         <button onClick={() => persist(guide)} className="flex items-center gap-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-1.5 font-semibold">
           <Save size={13} /> Save
         </button>
@@ -218,34 +229,14 @@ export function Editor({ projectId, guideId, onBack }: Props) {
         {/* Preview panel */}
         {previewVisible && (
           <div className="flex-1 overflow-y-auto bg-gray-900 p-6">
-            <div className={`transition-all ${DEVICE_WIDTHS[device]}`}>
-              <div className="bg-gray-950 rounded-xl border border-gray-800 min-h-96 p-6">
-                <h2 className="text-xl font-bold text-white mb-1">{guide.title}</h2>
-                {guide.subtitle && <p className="text-gray-400 text-sm mb-4">{guide.subtitle}</p>}
-                {activeSection ? (
-                  <div>
-                    <h3 className="text-lg font-semibold text-blue-400 mb-4">{activeSection.title}</h3>
-                    {activeSection.blocks.length === 0 ? (
-                      <p className="text-gray-600 text-sm">No blocks yet — add some from the panel</p>
-                    ) : (
-                      <div className="space-y-4">
-                        {activeSection.blocks.map(b => (
-                          <div key={b.id} className="text-gray-300 text-sm p-3 bg-gray-900 rounded-lg border border-gray-800">
-                            <span className="text-xs text-gray-600 uppercase tracking-wider">{b.type}</span>
-                            {b.type === 'text' && <p className="mt-1">{b.content}</p>}
-                            {b.type === 'highlight' && <p className="mt-1 font-medium">{b.title}: {b.content}</p>}
-                            {b.type === 'code' && <pre className="mt-1 text-xs font-mono text-green-400 overflow-x-auto">{b.code}</pre>}
-                            {b.type === 'image' && b.src && <img src={b.src} className="mt-2 max-h-32 rounded" />}
-                            {b.type === 'quote' && <blockquote className="mt-1 italic text-gray-300">"{b.content}" — {b.author}</blockquote>}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-gray-600 text-sm">Select a section to preview</p>
-                )}
-              </div>
+            <div className={`transition-all duration-200 h-full ${DEVICE_WIDTHS[device]}`}>
+              <GuidePreview
+                guide={guide}
+                theme={theme}
+                activeSectionId={activeSectionId}
+                onSectionChange={setActiveSectionId}
+                mode="inline"
+              />
             </div>
           </div>
         )}

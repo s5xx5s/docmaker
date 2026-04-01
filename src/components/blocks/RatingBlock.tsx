@@ -2,8 +2,25 @@ import type { RatingBlock as T } from '../../types';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function RatingBlock({ block, onUpdate }: Props) {
+export function RatingBlock({ block, onUpdate, isEditing }: Props) {
   const max = block.maxValue ?? 5;
+
+  if (!isEditing) {
+    return (
+      <div className="space-y-1">
+        {block.label && <p className="text-xs" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{block.label}</p>}
+        <div className="flex items-center gap-1">
+          {Array.from({ length: max }).map((_, i) => (
+            <span key={i} className="text-2xl leading-none" style={{ color: i < block.value ? '#facc15' : '#4b5563' }}>
+              {i < block.value ? '★' : '☆'}
+            </span>
+          ))}
+          {block.showValue && <span className="text-sm ml-2" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{block.value}/{max}</span>}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-1">

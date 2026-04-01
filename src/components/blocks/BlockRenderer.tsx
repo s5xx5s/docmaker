@@ -26,12 +26,15 @@ import { RatingBlock } from './RatingBlock';
 
 interface Props {
   block: Block;
-  onUpdate(patch: Partial<Block>): void;
-  isEditing: boolean;
+  onUpdate?: (patch: Partial<Block>) => void;
+  isEditing?: boolean;
+  theme?: import('../../types').Theme;
 }
 
-export function BlockRenderer({ block, onUpdate, isEditing }: Props) {
-  const props = { block: block as never, onUpdate: onUpdate as never, isEditing };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function BlockRenderer({ block, onUpdate, isEditing = false, theme: _theme }: Props) {
+  const noop = () => {};
+  const props = { block: block as never, onUpdate: (onUpdate ?? noop) as never, isEditing };
   switch (block.type) {
     case 'text':       return <TextBlock {...props} />;
     case 'highlight':  return <HighlightBlock {...props} />;

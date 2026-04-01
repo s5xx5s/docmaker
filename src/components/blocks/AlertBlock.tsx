@@ -10,8 +10,21 @@ const STYLES = {
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function AlertBlock({ block, onUpdate }: Props) {
+export function AlertBlock({ block, onUpdate, isEditing }: Props) {
   const s = STYLES[block.variant];
+
+  if (!isEditing) {
+    return (
+      <div className={`border-l-4 ${s.border} ${s.bg} rounded-r-lg p-3`}>
+        <div className="flex items-center gap-2 mb-1">
+          <span>{s.icon}</span>
+          <span className="text-sm font-semibold" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{block.title}</span>
+        </div>
+        {block.content && <p className="text-sm" style={{ color: 'var(--gp-text-muted, #cbd5e1)' }}>{block.content}</p>}
+      </div>
+    );
+  }
+
   return (
     <div className={`border-l-4 ${s.border} ${s.bg} rounded-r-lg p-3 space-y-2`}>
       <div className="flex items-center gap-2">

@@ -3,13 +3,29 @@ import type { StepsBlock as T } from '../../types';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function StepsBlock({ block, onUpdate }: Props) {
+export function StepsBlock({ block, onUpdate, isEditing }: Props) {
   const update = (i: number, patch: Partial<T['steps'][0]>) => {
     const steps = block.steps.map((s, idx) => idx === i ? { ...s, ...patch } : s);
     onUpdate({ steps });
   };
   const add = () => onUpdate({ steps: [...block.steps, { title: `Step ${block.steps.length + 1}`, description: '' }] });
   const remove = (i: number) => onUpdate({ steps: block.steps.filter((_, idx) => idx !== i) });
+
+  if (!isEditing) {
+    return (
+      <div className="space-y-2">
+        {block.steps.map((step, i) => (
+          <div key={i} className="flex gap-3 items-start">
+            <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center shrink-0 mt-1">{i + 1}</div>
+            <div className="flex-1">
+              <p className="text-sm font-medium" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{step.title}</p>
+              {step.description && <p className="text-xs mt-0.5" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{step.description}</p>}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">

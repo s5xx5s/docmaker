@@ -2,7 +2,25 @@ import type { DividerBlock as T } from '../../types';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function DividerBlock({ block, onUpdate }: Props) {
+export function DividerBlock({ block, onUpdate, isEditing }: Props) {
+  const borderStyle = block.style === 'dashed' ? 'border-dashed' : block.style === 'dotted' ? 'border-dotted' : '';
+
+  if (!isEditing) {
+    return (
+      <div className="flex items-center gap-3">
+        {block.label ? (
+          <>
+            <div className={`flex-1 border-t border-gray-600 ${borderStyle}`} />
+            <span className="text-xs" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{block.label}</span>
+            <div className={`flex-1 border-t border-gray-600 ${borderStyle}`} />
+          </>
+        ) : (
+          <div className={`flex-1 border-t border-gray-600 ${borderStyle}`} />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-3">
@@ -13,7 +31,7 @@ export function DividerBlock({ block, onUpdate }: Props) {
             <div className="flex-1 border-t border-gray-600" />
           </>
         ) : (
-          <div className={`flex-1 border-t border-gray-600 ${block.style === 'dashed' ? 'border-dashed' : block.style === 'dotted' ? 'border-dotted' : ''}`} />
+          <div className={`flex-1 border-t border-gray-600 ${borderStyle}`} />
         )}
       </div>
       <div className="flex gap-2">

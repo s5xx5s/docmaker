@@ -3,10 +3,25 @@ import type { FlowBlock as T } from '../../types';
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 
-export function FlowBlock({ block, onUpdate }: Props) {
+export function FlowBlock({ block, onUpdate, isEditing }: Props) {
   const update = (i: number, patch: Partial<T['steps'][0]>) => onUpdate({ steps: block.steps.map((s, idx) => idx === i ? { ...s, ...patch } : s) });
   const add = () => onUpdate({ steps: [...block.steps, { label: 'Step' }] });
   const remove = (i: number) => onUpdate({ steps: block.steps.filter((_, idx) => idx !== i) });
+
+  if (!isEditing) {
+    return (
+      <div className={`flex ${block.direction === 'vertical' ? 'flex-col' : 'flex-row flex-wrap'} gap-2 items-center`}>
+        {block.steps.map((step, i) => (
+          <div key={i} className="flex items-center gap-1">
+            <div className="bg-blue-700 rounded-lg px-3 py-1.5">
+              <span className="text-white text-xs font-medium">{step.label}</span>
+            </div>
+            {i < block.steps.length - 1 && <span className="text-gray-500 text-sm">{block.direction === 'vertical' ? '↓' : '→'}</span>}
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div>
