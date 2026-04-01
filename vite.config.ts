@@ -5,4 +5,8 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   base: '/docmaker/',
   plugins: [react(), tailwindcss()],
+  server: {
+    port: 5175,
+    strictPort: true,
+  },
 });
