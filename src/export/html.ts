@@ -25,14 +25,14 @@ function blockToHtml(block: Block): string {
       const icons: Record<string, string> = { info: 'ℹ️', warning: '⚠️', success: '✅', danger: '🚨' };
       return `<div class="gp-highlight gp-highlight-${block.variant}">
         <span class="gp-highlight-icon">${icons[block.variant] ?? 'ℹ️'}</span>
-        <div><strong>${escHtml(block.title)}</strong><p>${escHtml(block.content)}</p></div>
+        <div><strong>${escHtml(block.title ?? '')}</strong><p>${escHtml(block.content)}</p></div>
       </div>`;
     }
 
     case 'quote':
       return `<blockquote class="gp-quote">
         <p class="gp-quote-text">"${escHtml(block.content)}"</p>
-        <footer>— <cite>${escHtml(block.author)}${block.source ? `, <a href="${escHtml(block.source)}" target="_blank">${escHtml(block.source)}</a>` : ''}</cite></footer>
+        <footer>— <cite>${escHtml(block.author ?? '')}${block.source ? `, <a href="${escHtml(block.source ?? '')}" target="_blank">${escHtml(block.source ?? '')}</a>` : ''}</cite></footer>
       </blockquote>`;
 
     case 'alert': {
@@ -64,7 +64,7 @@ function blockToHtml(block: Block): string {
         <dd class="gp-faq-a">A: ${escHtml(item.answer)}</dd>`).join('')}</dl>`;
 
     case 'accordion':
-      return `<div class="gp-accordion">${block.items.map((item, i) => `
+      return `<div class="gp-accordion">${block.items.map((item) => `
         <div class="gp-accordion-item${item.defaultOpen ? ' open' : ''}">
           <button class="gp-accordion-btn" onclick="gpToggleAccordion(this)">${escHtml(item.title)} <span class="gp-accordion-arrow">▾</span></button>
           <div class="gp-accordion-body" style="${item.defaultOpen ? '' : 'display:none'}">${escHtml(item.content)}</div>
@@ -91,7 +91,7 @@ function blockToHtml(block: Block): string {
 
     case 'gallery':
       if (!block.images.length) return '';
-      return `<div class="gp-gallery gp-gallery-cols-${block.columns ?? 3}">${block.images.map((img, i) => `
+      return `<div class="gp-gallery gp-gallery-cols-${block.columns ?? 3}">${block.images.map((img) => `
         <figure class="gp-gallery-item"${block.lightbox ? ` onclick="gpLightbox('${escHtml(img.src ?? '')}')" style="cursor:pointer"` : ''}>
           <img src="${img.src ?? ''}" alt="${escHtml(img.alt ?? '')}" loading="lazy">
           ${img.caption ? `<figcaption>${escHtml(img.caption)}</figcaption>` : ''}
@@ -109,23 +109,23 @@ function blockToHtml(block: Block): string {
 
     case 'compare':
       return `<div class="gp-compare"><div class="gp-compare-col">
-        <h4>${escHtml(block.leftTitle)}</h4><ul>${block.leftItems.map(i => `<li>${escHtml(i)}</li>`).join('')}</ul>
+        <h4>${escHtml(block.leftTitle ?? '')}</h4><ul>${block.leftItems.map(i => `<li>${escHtml(i)}</li>`).join('')}</ul>
       </div><div class="gp-compare-col">
-        <h4>${escHtml(block.rightTitle)}</h4><ul>${block.rightItems.map(i => `<li>${escHtml(i)}</li>`).join('')}</ul>
+        <h4>${escHtml(block.rightTitle ?? '')}</h4><ul>${block.rightItems.map(i => `<li>${escHtml(i)}</li>`).join('')}</ul>
       </div></div>`;
 
     case 'stats':
       return `<div class="gp-stats gp-stats-cols-${block.columns ?? 3}">${block.items.map(s => `
-        <div class="gp-stat-card"><div class="gp-stat-value">${block.prefix ?? ''}${escHtml(s.value)}${block.suffix ?? ''}</div><div class="gp-stat-label">${escHtml(s.label)}</div></div>`).join('')}</div>`;
+        <div class="gp-stat-card"><div class="gp-stat-value">${s.prefix ?? ''}${escHtml(s.value)}${s.suffix ?? ''}</div><div class="gp-stat-label">${escHtml(s.label)}</div></div>`).join('')}</div>`;
 
     case 'cards':
       return `<div class="gp-cards gp-cards-cols-${block.columns ?? 3}">${block.cards.map(c => `
-        <div class="gp-card">${c.icon ? `<span class="gp-card-icon">${c.icon}</span>` : ''}<h4>${escHtml(c.title)}</h4><p>${escHtml(c.description)}</p></div>`).join('')}</div>`;
+        <div class="gp-card">${c.icon ? `<span class="gp-card-icon">${c.icon}</span>` : ''}<h4>${escHtml(c.title)}</h4><p>${escHtml(c.description ?? '')}</p></div>`).join('')}</div>`;
 
     case 'image-text': {
       const imgFirst = block.imagePosition !== 'right';
       const imgHtml = block.src ? `<div class="gp-image-text-img"><img src="${block.src}" alt="${escHtml(block.alt ?? '')}"></div>` : '';
-      const textHtml = `<div class="gp-image-text-content"><h3>${escHtml(block.title)}</h3><p>${escHtml(block.content)}</p></div>`;
+      const textHtml = `<div class="gp-image-text-content"><h3>${escHtml(block.title ?? '')}</h3><p>${escHtml(block.content)}</p></div>`;
       return `<div class="gp-image-text">${imgFirst ? imgHtml + textHtml : textHtml + imgHtml}</div>`;
     }
 
@@ -134,7 +134,7 @@ function blockToHtml(block: Block): string {
 
     case 'timeline':
       return `<div class="gp-timeline gp-timeline-${block.direction ?? 'vertical'}">${block.items.map(item => `
-        <div class="gp-timeline-item"><div class="gp-timeline-date">${escHtml(item.date)}</div>
+        <div class="gp-timeline-item"><div class="gp-timeline-date">${escHtml(item.date ?? '')}</div>
           <div class="gp-timeline-content"><strong>${escHtml(item.title)}</strong>${item.description ? `<p>${escHtml(item.description)}</p>` : ''}</div>
         </div>`).join('')}</div>`;
 

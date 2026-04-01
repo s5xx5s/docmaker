@@ -13,10 +13,10 @@ function blockToMd(block: Block): string {
       return block.content + '\n';
 
     case 'highlight':
-      return `> **${escMd(block.title)}**\n>\n> ${block.content}\n`;
+      return `> **${escMd(block.title ?? '')}**\n>\n> ${block.content}\n`;
 
     case 'quote':
-      return `> *"${escMd(block.content)}"*\n>\n> — ${escMd(block.author)}${block.source ? ` ([source](${block.source}))` : ''}\n`;
+      return `> *"${escMd(block.content)}"*\n>\n> — ${escMd(block.author ?? '')}${block.source ? ` ([source](${block.source}))` : ''}\n`;
 
     case 'alert':
       return `> [!${block.variant.toUpperCase()}]\n> **${escMd(block.title)}**${block.content ? `\n>\n> ${block.content}` : ''}\n`;
@@ -56,7 +56,7 @@ function blockToMd(block: Block): string {
     }
 
     case 'compare':
-      return `| ${escMd(block.leftTitle)} | ${escMd(block.rightTitle)} |\n| --- | --- |\n` +
+      return `| ${escMd(block.leftTitle ?? '')} | ${escMd(block.rightTitle ?? '')} |\n| --- | --- |\n` +
         Array.from({ length: Math.max(block.leftItems.length, block.rightItems.length) }, (_, i) =>
           `| ${escMd(block.leftItems[i] ?? '')} | ${escMd(block.rightItems[i] ?? '')} |`
         ).join('\n') + '\n';
@@ -68,13 +68,13 @@ function blockToMd(block: Block): string {
       return block.cards.map(c => `### ${c.icon ?? ''} ${escMd(c.title)}\n${c.description}`).join('\n\n') + '\n';
 
     case 'image-text':
-      return `${block.src ? `![${escMd(block.alt ?? '')}](${block.src})\n\n` : ''}### ${escMd(block.title)}\n${block.content}\n`;
+      return `${block.src ? `![${escMd(block.alt ?? '')}](${block.src})\n\n` : ''}### ${escMd(block.title ?? '')}\n${block.content}\n`;
 
     case 'flow':
       return block.steps.map(s => escMd(s.label)).join(block.direction === 'vertical' ? '\n↓\n' : ' → ') + '\n';
 
     case 'timeline':
-      return block.items.map(i => `- **${escMd(i.date)}** — **${escMd(i.title)}**${i.description ? `\n  ${i.description}` : ''}`).join('\n') + '\n';
+      return block.items.map(i => `- **${escMd(i.date ?? '')}** — **${escMd(i.title)}**${i.description ? `\n  ${i.description}` : ''}`).join('\n') + '\n';
 
     case 'rating': {
       const stars = '★'.repeat(Math.floor(block.value ?? 0)) + '☆'.repeat((block.maxValue ?? 5) - Math.floor(block.value ?? 0));

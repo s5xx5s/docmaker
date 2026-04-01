@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { X, Globe, Plus, Trash2, Loader, CheckCircle, AlertCircle, ChevronDown, ChevronRight } from 'lucide-react';
+import { X, Globe, Plus, Trash2, Loader, CheckCircle, AlertCircle } from 'lucide-react';
 import type { Guide, Section, Block } from '../../types';
 import { translate, type ProviderKey } from '../../providers/translation';
 
@@ -40,7 +40,7 @@ function saveKeys(keys: Record<string, string>) {
 // ── Extract translatable strings from a block ────────────────────────────────
 
 function extractBlockStrings(block: Block): string[] {
-  const b = block as Record<string, unknown>;
+  const b = block as unknown as Record<string, unknown>;
   const strings: string[] = [];
   const pick = (keys: string[]) => keys.forEach(k => { if (typeof b[k] === 'string' && (b[k] as string).trim()) strings.push(b[k] as string); });
 
@@ -191,7 +191,7 @@ function applyTranslationsToBlock(block: Block, translations: string[]): Block {
       break;
     }
   }
-  return b as Block;
+  return b as unknown as Block;
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
