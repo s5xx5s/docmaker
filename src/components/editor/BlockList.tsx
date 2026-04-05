@@ -70,6 +70,7 @@ export function BlockList({ blocks, selectedBlockId, onSelect, onReorder, onAdd,
                     onDuplicate={() => onDuplicate(block.id)}
                     onMoveUp={() => onMoveUp(block.id)}
                     onMoveDown={() => onMoveDown(block.id)}
+                    onUpdate={(patch) => onUpdate(block.id, patch)}
                   >
                     <BlockRenderer block={block} onUpdate={(patch) => onUpdate(block.id, patch)} isEditing={block.id === selectedBlockId} />
                   </BlockWrapper>

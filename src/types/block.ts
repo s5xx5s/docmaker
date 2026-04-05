@@ -9,6 +9,8 @@ export type BlockType =
 interface BaseBlock {
   id: string;
   type: BlockType;
+  blockAlign?: 'left' | 'center' | 'right';
+  blockDir?: 'ltr' | 'rtl';
 }
 
 // ── الـ 12 الحالية ────────────────────────────────────────────────────────────

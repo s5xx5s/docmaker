@@ -71,7 +71,8 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (!dragging.current) return;
-      const delta = e.clientX - dragStartX.current;
+      const raw = e.clientX - dragStartX.current;
+      const delta = document.documentElement.dir === 'rtl' ? -raw : raw;
       setBlockPanelWidth(Math.max(240, Math.min(600, dragStartW.current + delta)));
     };
     const onUp = () => {
