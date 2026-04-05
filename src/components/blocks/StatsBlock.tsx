@@ -11,7 +11,7 @@ export function StatsBlock({ block, onUpdate, isEditing }: Props) {
   if (!isEditing) {
     const cols = block.columns ?? 3;
     return (
-      <div className={`grid grid-cols-${cols} gap-3`}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '12px' }}>
         {block.items.map((item, i) => (
           <div key={i} className="bg-gray-800 rounded-xl p-3 text-center">
             <div className="flex items-baseline justify-center gap-0.5">
@@ -28,7 +28,7 @@ export function StatsBlock({ block, onUpdate, isEditing }: Props) {
 
   return (
     <div>
-      <div className={`grid grid-cols-${block.columns ?? 3} gap-3 mb-3`}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${block.columns ?? 3}, 1fr)`, gap: '12px', marginBottom: '12px' }}>
         {block.items.map((item, i) => (
           <div key={i} className="bg-gray-800 rounded-xl p-3 text-center relative group/stat">
             <button onClick={() => remove(i)} className="absolute top-1 right-1 text-gray-600 hover:text-red-400 opacity-0 group-hover/stat:opacity-100"><Trash2 size={11} /></button>

@@ -11,7 +11,7 @@ export function CardsBlock({ block, onUpdate, isEditing }: Props) {
   if (!isEditing) {
     const cols = block.columns ?? 3;
     return (
-      <div className={`grid grid-cols-${cols} gap-3`}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '12px' }}>
         {block.cards.map((card, i) => (
           <div key={i} className="bg-gray-800 rounded-lg p-3 space-y-1">
             {card.icon && <div className="text-2xl">{card.icon}</div>}

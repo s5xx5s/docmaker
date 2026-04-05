@@ -1,43 +1,136 @@
 import { useState } from 'react';
-import { ArrowLeft, Plus, BookOpen, MoreVertical, Edit2, Trash2, Clock, Globe } from 'lucide-react';
+import { ArrowLeft, Plus, BookOpen, MoreVertical, Edit2, Trash2, Clock, Globe, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useProjectStore } from '../store/project.store';
 import { useSettingsStore } from '../store/settings.store';
 import { useT } from '../i18n';
-import type { Guide } from '../types';
+import { generateId } from '../utils/id';
+import { getDefaultBlock } from '../components/blocks/defaultBlocks';
+import { GUIDE_TEMPLATES } from '../data/templates';
+import type { Guide, Block, Section } from '../types';
 
-interface Props {
-  projectId: string;
-  onBack(): void;
-  onOpenGuide(guideId: string): void;
+// ── Build sections from a template ──────────────────────────────────────────
+
+function buildTemplateSections(templateId: string, uiLang: 'en' | 'ar'): Section[] {
+  const tmpl = GUIDE_TEMPLATES.find(t => t.id === templateId);
+  if (!tmpl || tmpl.sections.length === 0) return [];
+  return tmpl.sections.map((sd, order) => ({
+    id:           generateId(),
+    title:        sd.title[uiLang],
+    icon:         sd.icon,
+    order,
+    isActive:     true,
+    translations: {},
+    blocks:       sd.blockTypes.map(type => ({ ...getDefaultBlock(type), id: generateId() } as Block)),
+  }));
 }
 
-function GuideModal({ onSave, onClose }: { onSave(title: string): void; onClose(): void }) {
+// ── 2-step Guide Creation Modal ──────────────────────────────────────────────
+
+interface GuideModalProps {
+  uiLang: 'en' | 'ar';
+  onSave(title: string, templateId: string): void;
+  onClose(): void;
+}
+
+function GuideModal({ uiLang, onSave, onClose }: GuideModalProps) {
+  const [step, setStep] = useState<1 | 2>(1);
   const [title, setTitle] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState('blank');
   const t = useT();
+  const isAr = uiLang === 'ar';
+
+  const handleCreate = () => {
+    if (!title.trim()) return;
+    onSave(title.trim(), selectedTemplate);
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md shadow-2xl">
-        <div className="px-6 py-4 border-b border-gray-800">
-          <h2 className="font-semibold text-white">{t('newGuide')}</h2>
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg shadow-2xl">
+
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
+          <h2 className="font-semibold text-white">
+            {step === 1 ? t('newGuide') : t('templates')}
+          </h2>
+          <span className="text-xs text-gray-500">{step} / 2</span>
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); if (title.trim()) { onSave(title.trim()); onClose(); } }} className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm text-gray-400 mb-1.5">{t('guideTitle')} *</label>
-            <input
-              autoFocus value={title} onChange={(e) => setTitle(e.target.value)}
-              placeholder={t('guideTitle')}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
-            />
+
+        {/* Step 1: Title */}
+        {step === 1 && (
+          <div className="p-6 space-y-4">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1.5">{t('guideTitle')} *</label>
+              <input
+                autoFocus
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && title.trim()) setStep(2); }}
+                placeholder={t('guideTitle')}
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm"
+              />
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button type="button" onClick={onClose} className="flex-1 border border-gray-700 text-gray-400 rounded-lg py-2 text-sm">{t('cancel')}</button>
+              <button
+                onClick={() => setStep(2)}
+                disabled={!title.trim()}
+                className="flex-1 bg-blue-500 hover:bg-blue-400 disabled:opacity-40 text-white rounded-lg py-2 text-sm font-semibold flex items-center justify-center gap-1.5"
+              >
+                {isAr ? 'التالي' : 'Next'} {isAr ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+              </button>
+            </div>
           </div>
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 border border-gray-700 text-gray-400 rounded-lg py-2 text-sm">{t('cancel')}</button>
-            <button type="submit" disabled={!title.trim()} className="flex-1 bg-blue-500 hover:bg-blue-400 disabled:opacity-40 text-white rounded-lg py-2 text-sm font-semibold">{t('createGuide')}</button>
+        )}
+
+        {/* Step 2: Template Picker */}
+        {step === 2 && (
+          <div className="p-6">
+            <p className="text-xs text-gray-500 mb-4">
+              {isAr ? 'اختر قالباً للبدء أو ابدأ فارغاً' : 'Choose a template to start or begin blank'}
+            </p>
+            <div className="grid grid-cols-2 gap-2 mb-5">
+              {GUIDE_TEMPLATES.map(tmpl => (
+                <button
+                  key={tmpl.id}
+                  onClick={() => setSelectedTemplate(tmpl.id)}
+                  className={`text-start p-3 rounded-xl border transition-all ${
+                    selectedTemplate === tmpl.id
+                      ? 'border-blue-500 bg-blue-500/10'
+                      : 'border-gray-700 hover:border-gray-600 bg-gray-800/50'
+                  }`}
+                >
+                  <div className="text-xl mb-1.5">{tmpl.icon}</div>
+                  <p className="text-sm font-medium text-white leading-tight">{tmpl.name[uiLang]}</p>
+                  <p className="text-xs text-gray-500 mt-0.5 leading-tight">{tmpl.description[uiLang]}</p>
+                  {tmpl.sections.length > 0 && (
+                    <p className="text-xs text-gray-600 mt-1">
+                      {tmpl.sections.length} {isAr ? 'أقسام' : 'sections'}
+                    </p>
+                  )}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setStep(1)} className="flex items-center gap-1 border border-gray-700 text-gray-400 rounded-lg px-4 py-2 text-sm">
+                {isAr ? <ChevronRight size={14} /> : <ChevronLeft size={14} />} {isAr ? 'السابق' : 'Back'}
+              </button>
+              <button
+                onClick={handleCreate}
+                className="flex-1 bg-blue-500 hover:bg-blue-400 text-white rounded-lg py-2 text-sm font-semibold"
+              >
+                {t('createGuide')}
+              </button>
+            </div>
           </div>
-        </form>
+        )}
       </div>
     </div>
   );
 }
+
+// ── Guide Card ───────────────────────────────────────────────────────────────
 
 function GuideCard({ guide, onOpen, onDelete }: { guide: Guide; onOpen(): void; onDelete(): void }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -85,8 +178,16 @@ function GuideCard({ guide, onOpen, onDelete }: { guide: Guide; onOpen(): void; 
   );
 }
 
+// ── Main Page ────────────────────────────────────────────────────────────────
+
+interface Props {
+  projectId: string;
+  onBack(): void;
+  onOpenGuide(guideId: string): void;
+}
+
 export function ProjectPage({ projectId, onBack, onOpenGuide }: Props) {
-  const { projects, addGuide, deleteGuide } = useProjectStore();
+  const { projects, addGuide, updateGuide, deleteGuide } = useProjectStore();
   const { settings, updateSettings } = useSettingsStore();
   const project = projects.find(p => p.id === projectId);
   const [modalOpen, setModalOpen] = useState(false);
@@ -95,6 +196,18 @@ export function ProjectPage({ projectId, onBack, onOpenGuide }: Props) {
   const isAr = settings.uiLang === 'ar';
 
   if (!project) return <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center"><p className="text-gray-400">{t('projectNotFound')}</p></div>;
+
+  function handleCreateGuide(title: string, templateId: string) {
+    const guide = addGuide(projectId, title);
+    if (templateId !== 'blank') {
+      const sections = buildTemplateSections(templateId, settings.uiLang as 'en' | 'ar');
+      if (sections.length > 0) {
+        updateGuide(projectId, guide.id, { sections });
+      }
+    }
+    // Auto-open the new guide in the editor
+    onOpenGuide(guide.id);
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -119,6 +232,7 @@ export function ProjectPage({ projectId, onBack, onOpenGuide }: Props) {
           </button>
         </div>
       </nav>
+
       <main className="max-w-6xl mx-auto px-6 py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -126,6 +240,7 @@ export function ProjectPage({ projectId, onBack, onOpenGuide }: Props) {
             <p className="text-gray-400 text-sm mt-1">{isAr ? `${project.guides.length} دليل` : `${project.guides.length} guide${project.guides.length !== 1 ? 's' : ''}`}</p>
           </div>
         </div>
+
         {project.guides.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="w-16 h-16 bg-gray-900 rounded-2xl flex items-center justify-center mb-4">
@@ -150,12 +265,15 @@ export function ProjectPage({ projectId, onBack, onOpenGuide }: Props) {
           </div>
         )}
       </main>
+
       {modalOpen && (
         <GuideModal
-          onSave={(title) => addGuide(projectId, title)}
+          uiLang={settings.uiLang as 'en' | 'ar'}
+          onSave={handleCreateGuide}
           onClose={() => setModalOpen(false)}
         />
       )}
+
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, ExternalLink, Palette, Languages, Download, AlignLeft, AlignRight, Globe } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, ExternalLink, Palette, Languages, Download, AlignLeft, AlignRight, Globe, Undo2, Redo2, AlertTriangle } from 'lucide-react';
+import { getStorageUsageKB, STORAGE_LIMIT_KB } from '../utils/storage';
 import { exportGuideAsHTML } from '../export/html';
 import { useProjectStore } from '../store/project.store';
 import { useThemeStore } from '../store/theme.store';
@@ -53,6 +54,20 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
 
   const t = useT();
   const { settings, updateSettings } = useSettingsStore();
+
+  // ── Undo / Redo history ───────────────────────────────────────────────────
+  const pastRef   = useRef<Guide[]>([]);
+  const futureRef = useRef<Guide[]>([]);
+  const [, _bump] = useState(0);
+  const bump = () => _bump(v => v + 1);
+
+  const canUndo = pastRef.current.length > 0;
+  const canRedo = futureRef.current.length > 0;
+
+  // ── Storage warning ───────────────────────────────────────────────────────
+  const [storageWarningDismissed, setStorageWarningDismissed] = useState(false);
+  const storageUsedKB = getStorageUsageKB();
+  const showStorageWarning = !storageWarningDismissed && storageUsedKB > STORAGE_LIMIT_KB * 0.8;
 
   // ── Resizable panels ──────────────────────────────────────────────────────
   const [blockPanelWidth, setBlockPanelWidth] = useState(320);
@@ -120,6 +135,21 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
     return () => clearTimeout(timer);
   }, [saveStatus, guide, persist]);
 
+  // ── Keyboard shortcuts ────────────────────────────────────────────────────
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const ctrl = e.ctrlKey || e.metaKey;
+      if (!ctrl) return;
+      if (e.key === 's') { e.preventDefault(); if (guide) persist(guide); }
+      if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+      if (e.key === 'z' && e.shiftKey)  { e.preventDefault(); redo(); }
+      if (e.key === 'y')                { e.preventDefault(); redo(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guide, persist]);
+
   if (!guide) return (
     <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
       <p className="text-gray-400">Guide not found</p>
@@ -127,7 +157,43 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
   );
 
   function mutate(updater: (g: Guide) => Guide) {
-    setGuide(prev => { if (!prev) return prev; const next = updater(prev); setSaveStatus('unsaved'); return next; });
+    setGuide(prev => {
+      if (!prev) return prev;
+      // Push current state to past before updating
+      pastRef.current = [...pastRef.current.slice(-49), prev];
+      futureRef.current = [];
+      setSaveStatus('unsaved');
+      return updater(prev);
+    });
+    bump();
+  }
+
+  function undo() {
+    const past = pastRef.current;
+    if (past.length === 0) return;
+    const prev = past[past.length - 1];
+    setGuide(current => {
+      if (!current) return current;
+      futureRef.current = [current, ...futureRef.current.slice(0, 49)];
+      pastRef.current = past.slice(0, -1);
+      setSaveStatus('unsaved');
+      return prev;
+    });
+    bump();
+  }
+
+  function redo() {
+    const future = futureRef.current;
+    if (future.length === 0) return;
+    const next = future[0];
+    setGuide(current => {
+      if (!current) return current;
+      pastRef.current = [...pastRef.current.slice(-49), current];
+      futureRef.current = future.slice(1);
+      setSaveStatus('unsaved');
+      return next;
+    });
+    bump();
   }
 
   // ── Section operations ───────────────────────────────────────────────────────
@@ -210,6 +276,9 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
       {/* Topbar */}
       <nav className="border-b border-gray-800 px-4 py-3 flex items-center gap-4 shrink-0">
         <button onClick={onBack} className="text-gray-400 hover:text-white"><ArrowLeft size={18} /></button>
+        {/* Undo / Redo */}
+        <button onClick={undo} disabled={!canUndo} title={`${t('undo')} (Ctrl+Z)`}  className="text-gray-400 hover:text-white disabled:opacity-25 disabled:cursor-not-allowed p-1 rounded"><Undo2 size={15} /></button>
+        <button onClick={redo} disabled={!canRedo} title={`${t('redo')} (Ctrl+Y)`}  className="text-gray-400 hover:text-white disabled:opacity-25 disabled:cursor-not-allowed p-1 rounded"><Redo2 size={15} /></button>
         <div className="flex-1">
           <input
             value={guide.title}
@@ -277,6 +346,20 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
           <Save size={13} /> {t('save')}
         </button>
       </nav>
+
+      {/* Storage warning banner */}
+      {showStorageWarning && (
+        <div className="flex items-center gap-2 bg-yellow-900/40 border-b border-yellow-800/60 px-4 py-2 shrink-0">
+          <AlertTriangle size={14} className="text-yellow-400 shrink-0" />
+          <span className="text-xs text-yellow-300 flex-1">
+            {t('storageWarning')} — {storageUsedKB} KB / {STORAGE_LIMIT_KB} KB.
+            {' '}{settings.uiLang === 'ar' ? 'صدّر بياناتك لتحرير مساحة.' : 'Export your data to free space.'}
+          </span>
+          <button onClick={() => setStorageWarningDismissed(true)} className="text-yellow-500 hover:text-yellow-300 text-xs px-2 py-0.5 rounded border border-yellow-700 hover:border-yellow-500">
+            {t('cancel')}
+          </button>
+        </div>
+      )}
 
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">

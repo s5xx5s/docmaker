@@ -61,6 +61,12 @@ const T = {
     ltr: 'LTR →',
     rtl: '← RTL',
     logo: 'Logo',
+    // Editor actions
+    undo: 'Undo',
+    redo: 'Redo',
+    templates: 'Templates',
+    blankGuide: 'Blank Guide',
+    storageWarning: 'Storage almost full',
   },
   ar: {
     // Home
@@ -122,6 +128,12 @@ const T = {
     ltr: 'يسار → يمين',
     rtl: 'يمين ← يسار',
     logo: 'شعار',
+    // Editor actions
+    undo: 'تراجع',
+    redo: 'إعادة',
+    templates: 'القوالب',
+    blankGuide: 'دليل فارغ',
+    storageWarning: 'التخزين يقترب من الامتلاء',
   },
 } as const;
 

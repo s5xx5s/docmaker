@@ -33,6 +33,21 @@ export function saveSettings<T>(settings: T): void {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
+// ── Storage Usage ─────────────────────────────────────────────────────────────
+
+/** Returns total localStorage usage in KB */
+export function getStorageUsageKB(): number {
+  let total = 0;
+  for (const key in localStorage) {
+    if (!Object.prototype.hasOwnProperty.call(localStorage, key)) continue;
+    total += (localStorage.getItem(key) ?? '').length;
+  }
+  return Math.round(total / 1024);
+}
+
+/** Browser localStorage limit is typically 5 MB */
+export const STORAGE_LIMIT_KB = 5120;
+
 // ── Import / Export ───────────────────────────────────────────────────────────
 
 export function exportProjectsJSON(projects: Project[]): void {
