@@ -1,6 +1,6 @@
 import type { HighlightBlock as T } from '../../types';
 
-const COLORS = { info: 'border-blue-500 bg-blue-950/30', warning: 'border-yellow-500 bg-yellow-950/30', success: 'border-green-500 bg-green-950/30', danger: 'border-red-500 bg-red-950/30' };
+const COLORS = { info: 'border-s-4 border-blue-500 bg-blue-950/30', warning: 'border-s-4 border-yellow-500 bg-yellow-950/30', success: 'border-s-4 border-green-500 bg-green-950/30', danger: 'border-s-4 border-red-500 bg-red-950/30' };
 const ICONS = { info: 'ℹ️', warning: '⚠️', success: '✅', danger: '🚨' };
 
 interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
@@ -8,17 +8,17 @@ interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 export function HighlightBlock({ block, onUpdate, isEditing }: Props) {
   if (!isEditing) {
     return (
-      <div className={`border-l-4 rounded-r-lg p-3 ${COLORS[block.variant]}`}>
+      <div className={`rounded-e-lg p-3 ${COLORS[block.variant]}`}>
         <div className="flex items-center gap-2 mb-1">
           <span>{ICONS[block.variant]}</span>
           {block.title && <span className="text-sm font-semibold" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{block.title}</span>}
         </div>
-        <p className="text-sm" style={{ color: 'var(--gp-text-muted, #cbd5e1)' }}>{block.content}</p>
+        <p className="text-sm" style={{ color: 'var(--gp-muted, #cbd5e1)' }}>{block.content}</p>
       </div>
     );
   }
   return (
-    <div className={`border-l-4 rounded-r-lg p-3 ${COLORS[block.variant]}`}>
+    <div className={`rounded-e-lg p-3 ${COLORS[block.variant]}`}>
       <div className="flex items-center gap-2 mb-1">
         <span>{ICONS[block.variant]}</span>
         <input value={block.title ?? ''} onChange={e => onUpdate({ title: e.target.value })} placeholder="Title" className="bg-transparent text-sm font-semibold text-white focus:outline-none flex-1" />

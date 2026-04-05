@@ -16,7 +16,7 @@ export function CardsBlock({ block, onUpdate, isEditing }: Props) {
           <div key={i} className="bg-gray-800 rounded-lg p-3 space-y-1">
             {card.icon && <div className="text-2xl">{card.icon}</div>}
             <p className="text-sm font-medium" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{card.title}</p>
-            {card.description && <p className="text-xs" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{card.description}</p>}
+            {card.description && <p className="text-xs" style={{ color: 'var(--gp-muted, #94a3b8)' }}>{card.description}</p>}
           </div>
         ))}
       </div>

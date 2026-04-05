@@ -7,7 +7,7 @@ export function TextBlock({ block, onUpdate, isEditing }: Props) {
     return (
       <p
         className="leading-relaxed whitespace-pre-wrap"
-        style={{ textAlign: block.align ?? 'left', color: 'var(--gp-text, #f1f5f9)', fontSize: 'inherit' }}
+        style={{ textAlign: block.align ?? 'start', color: 'var(--gp-text, #f1f5f9)', fontSize: 'inherit' }}
       >
         {block.content}
       </p>

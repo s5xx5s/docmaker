@@ -7,14 +7,15 @@ interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 export function CodeBlock({ block, onUpdate, isEditing }: Props) {
   if (!isEditing) {
     return (
-      <div className="bg-gray-950 rounded-lg p-3 border border-gray-800">
+      // Code is always LTR regardless of guide direction
+      <div className="bg-gray-950 rounded-lg p-3 border border-gray-800" dir="ltr">
         {(block.filename || block.language) && (
           <div className="flex items-center gap-2 mb-2">
             {block.filename && <span className="text-xs text-gray-500 font-mono">{block.filename}</span>}
             {block.language && <span className="text-xs text-gray-600 font-mono ml-auto">{block.language}</span>}
           </div>
         )}
-        <pre className="text-green-300 font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre">
+        <pre className="text-green-300 font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre" dir="ltr">
           {block.showLineNumbers
             ? block.code.split('\n').map((line, i) => (
                 <span key={i} className="block">
@@ -29,7 +30,7 @@ export function CodeBlock({ block, onUpdate, isEditing }: Props) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" dir="ltr">
       <div className="flex items-center gap-2">
         <select value={block.language} onChange={e => onUpdate({ language: e.target.value })} className="bg-gray-800 text-xs text-gray-300 rounded px-2 py-1 border border-gray-700 focus:outline-none">
           {LANGS.map(l => <option key={l} value={l}>{l}</option>)}
@@ -47,6 +48,7 @@ export function CodeBlock({ block, onUpdate, isEditing }: Props) {
           onChange={e => onUpdate({ code: e.target.value })}
           rows={8}
           spellCheck={false}
+          dir="ltr"
           className="w-full bg-transparent text-green-300 font-mono text-xs resize-y focus:outline-none leading-relaxed"
         />
       </div>

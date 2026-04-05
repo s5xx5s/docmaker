@@ -21,6 +21,7 @@ function themeToStyle(theme: Theme): React.CSSProperties {
     '--gp-surface':   theme.colors.surface,
     '--gp-text':      theme.colors.text,
     '--gp-muted':     theme.colors.textMuted,
+    '--gp-text-muted': theme.colors.textMuted, // alias used by some blocks
     '--gp-border':    theme.colors.border,
     '--gp-success':   theme.colors.success,
     '--gp-warning':   theme.colors.warning,

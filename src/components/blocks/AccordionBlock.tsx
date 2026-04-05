@@ -20,14 +20,14 @@ export function AccordionBlock({ block, onUpdate, isEditing }: Props) {
             <div key={i} className="border border-gray-700 rounded-lg overflow-hidden">
               <button
                 onClick={() => toggle(i)}
-                className="w-full flex items-center gap-2 px-3 py-2 bg-gray-800 text-left"
+                className="w-full flex items-center gap-2 px-3 py-2 bg-gray-800 text-start"
               >
                 <ChevronDown size={14} className={`transition-transform text-gray-400 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
                 <span className="flex-1 text-sm font-medium" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{item.title}</span>
               </button>
               {isOpen && (
                 <div className="px-3 py-2 bg-gray-900">
-                  <p className="text-xs" style={{ color: 'var(--gp-text-muted, #cbd5e1)' }}>{item.content}</p>
+                  <p className="text-xs" style={{ color: 'var(--gp-muted, #cbd5e1)' }}>{item.content}</p>
                 </div>
               )}
             </div>

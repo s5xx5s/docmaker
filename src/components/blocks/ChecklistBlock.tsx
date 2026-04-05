@@ -24,7 +24,7 @@ export function ChecklistBlock({ block, onUpdate, isEditing }: Props) {
                 readOnly={!block.interactive}
                 className="w-4 h-4 rounded accent-blue-500"
               />
-              <span className={`text-sm ${isChecked ? 'line-through' : ''}`} style={{ color: isChecked ? 'var(--gp-text-muted, #64748b)' : 'var(--gp-text, #f1f5f9)' }}>
+              <span className={`text-sm ${isChecked ? 'line-through' : ''}`} style={{ color: isChecked ? 'var(--gp-muted, #64748b)' : 'var(--gp-text, #f1f5f9)' }}>
                 {item.label}
               </span>
             </div>

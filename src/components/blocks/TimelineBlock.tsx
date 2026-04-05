@@ -17,7 +17,7 @@ export function TimelineBlock({ block, onUpdate, isEditing }: Props) {
             <div className="flex-1">
               {item.date && <p className="text-xs text-blue-400 mb-0.5">{item.date}</p>}
               <p className="text-sm font-medium" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{item.title}</p>
-              {item.description && <p className="text-xs mt-0.5" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{item.description}</p>}
+              {item.description && <p className="text-xs mt-0.5" style={{ color: 'var(--gp-muted, #94a3b8)' }}>{item.description}</p>}
             </div>
           </div>
         ))}

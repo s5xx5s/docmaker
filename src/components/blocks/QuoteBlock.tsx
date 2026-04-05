@@ -5,7 +5,7 @@ interface Props { block: T; onUpdate(p: Partial<T>): void; isEditing: boolean }
 export function QuoteBlock({ block, onUpdate, isEditing }: Props) {
   if (!isEditing) {
     return (
-      <blockquote className="border-l-4 border-blue-500 pl-4 py-1 space-y-1">
+      <blockquote className="border-s-4 border-blue-500 ps-4 py-1 space-y-1">
         <span className="text-4xl text-blue-400 leading-none">"</span>
         <p className="text-sm italic leading-relaxed" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{block.content}</p>
         {(block.author || block.source) && (
@@ -19,7 +19,7 @@ export function QuoteBlock({ block, onUpdate, isEditing }: Props) {
   }
 
   return (
-    <div className="border-l-4 border-blue-500 pl-4 py-1 space-y-2">
+    <div className="border-s-4 border-blue-500 ps-4 py-1 space-y-2">
       <span className="text-4xl text-blue-400 leading-none">"</span>
       <textarea value={block.content} onChange={e => onUpdate({ content: e.target.value })} rows={3} className="w-full bg-transparent text-gray-200 text-sm italic leading-relaxed resize-none focus:outline-none" />
       <div className="flex gap-2">

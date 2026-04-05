@@ -19,7 +19,7 @@ export function StepsBlock({ block, onUpdate, isEditing }: Props) {
             <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center shrink-0 mt-1">{i + 1}</div>
             <div className="flex-1">
               <p className="text-sm font-medium" style={{ color: 'var(--gp-text, #f1f5f9)' }}>{step.title}</p>
-              {step.description && <p className="text-xs mt-0.5" style={{ color: 'var(--gp-text-muted, #94a3b8)' }}>{step.description}</p>}
+              {step.description && <p className="text-xs mt-0.5" style={{ color: 'var(--gp-muted, #94a3b8)' }}>{step.description}</p>}
             </div>
           </div>
         ))}
