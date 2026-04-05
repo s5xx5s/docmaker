@@ -14,7 +14,7 @@ interface Props {
   onLanding?(): void;
 }
 
-export function Home({ onOpenProject, onSettings, onLanding: _onLanding }: Props) {
+export function Home({ onOpenProject, onSettings, onLanding }: Props) {
   const { projects, addProject, updateProject, deleteProject, duplicateProject, importProject } = useProjectStore();
   const { settings, updateSettings } = useSettingsStore();
   const [search, setSearch] = useState('');
@@ -52,10 +52,14 @@ export function Home({ onOpenProject, onSettings, onLanding: _onLanding }: Props
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Topbar */}
       <nav className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <button
+          onClick={onLanding}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          title={isAr ? 'الصفحة الرئيسية' : 'Back to Home'}
+        >
           <BookOpen className="text-blue-400" size={22} />
           <span className="font-bold text-lg tracking-tight">docmaker</span>
-        </div>
+        </button>
         <div className="flex items-center gap-2">
           <input
             ref={fileInputRef}

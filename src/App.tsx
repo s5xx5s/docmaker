@@ -15,10 +15,12 @@ type Route =
   | { page: 'preview'; projectId: string; guideId: string }
   | { page: 'settings' };
 
+// Use sessionStorage so landing always shows on fresh tab/visit
 const LAUNCHED_KEY = 'docmaker_launched';
 
 export default function App() {
-  const hasLaunched = localStorage.getItem(LAUNCHED_KEY) === 'true';
+  // sessionStorage resets every new tab/window — landing always shows first
+  const hasLaunched = sessionStorage.getItem(LAUNCHED_KEY) === 'true';
   const [route, setRoute] = useState<Route>(hasLaunched ? { page: 'home' } : { page: 'landing' });
   const uiLang = useSettingsStore(s => s.settings.uiLang);
 
@@ -28,16 +30,16 @@ export default function App() {
     document.documentElement.lang = uiLang;
   }, [uiLang]);
 
-  // Once user dismisses landing, remember it
+  // Mark session as launched when user leaves landing
   useEffect(() => {
     if (route.page !== 'landing') {
-      localStorage.setItem(LAUNCHED_KEY, 'true');
+      sessionStorage.setItem(LAUNCHED_KEY, 'true');
     }
   }, [route.page]);
 
-  // If on landing but has projects, allow going home
+  // Navigate from landing → home
   function goHome() {
-    localStorage.setItem(LAUNCHED_KEY, 'true');
+    sessionStorage.setItem(LAUNCHED_KEY, 'true');
     setRoute({ page: 'home' });
   }
 
