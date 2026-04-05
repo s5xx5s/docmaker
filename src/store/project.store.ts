@@ -2,6 +2,20 @@ import { create } from 'zustand';
 import type { Project, Guide, Section } from '../types';
 import { generateId } from '../utils/id';
 import { loadProjects, saveProjects } from '../utils/storage';
+import { demoProject, DEMO_SEEDED_KEY } from '../data/demoProject';
+
+// Seed demo project for first-time visitors (only once per browser)
+function getInitialProjects(): Project[] {
+  const saved = loadProjects();
+  if (saved.length > 0) return saved;
+  // First visit — load demo + mark as seeded
+  if (!localStorage.getItem(DEMO_SEEDED_KEY)) {
+    localStorage.setItem(DEMO_SEEDED_KEY, 'true');
+    saveProjects([demoProject]);
+    return [demoProject];
+  }
+  return [];
+}
 
 interface ProjectStore {
   projects: Project[];
@@ -60,7 +74,7 @@ function makeSection(title: string): Section {
 }
 
 export const useProjectStore = create<ProjectStore>((set, get) => ({
-  projects: loadProjects(),
+  projects: getInitialProjects(),
   activeProjectId: null,
   activeGuideId: null,
 
