@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
-import { Plus, Search, Upload, BookOpen, Settings } from 'lucide-react';
+import { Plus, Search, Upload, BookOpen, Settings, Globe } from 'lucide-react';
 import { useProjectStore } from '../store/project.store';
+import { useSettingsStore } from '../store/settings.store';
 import { ProjectCard } from '../components/project/ProjectCard';
 import { ProjectModal } from '../components/project/ProjectModal';
 import type { Project } from '../types';
@@ -15,12 +16,14 @@ interface Props {
 
 export function Home({ onOpenProject, onSettings, onLanding: _onLanding }: Props) {
   const { projects, addProject, updateProject, deleteProject, duplicateProject, importProject } = useProjectStore();
+  const { settings, updateSettings } = useSettingsStore();
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const t = useT();
+  const isAr = settings.uiLang === 'ar';
 
   const filtered = projects.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -75,6 +78,15 @@ export function Home({ onOpenProject, onSettings, onLanding: _onLanding }: Props
             <Plus size={15} />
             {t('newProject')}
           </button>
+          {/* Language toggle */}
+          <button
+            onClick={() => updateSettings({ uiLang: isAr ? 'en' : 'ar' })}
+            className="flex items-center gap-1.5 text-sm font-semibold text-gray-400 hover:text-white border border-gray-800 hover:border-blue-500 rounded-lg px-3 py-2 transition-colors"
+            title={isAr ? 'Switch to English' : 'التبديل إلى العربية'}
+          >
+            <Globe size={14} />
+            {isAr ? 'EN' : 'عربي'}
+          </button>
           {onSettings && (
             <button onClick={onSettings} className="text-gray-400 hover:text-white p-2 rounded-lg border border-gray-800 hover:border-gray-600 transition-colors" title={t('settings')}>
               <Settings size={15} />
@@ -89,7 +101,7 @@ export function Home({ onOpenProject, onSettings, onLanding: _onLanding }: Props
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-white">{t('projects')}</h1>
-            <p className="text-gray-400 text-sm mt-1">{projects.length} project{projects.length !== 1 ? 's' : ''}</p>
+            <p className="text-gray-400 text-sm mt-1">{isAr ? `${projects.length} مشروع` : `${projects.length} project${projects.length !== 1 ? 's' : ''}`}</p>
           </div>
           {/* Search */}
           <div className="relative">

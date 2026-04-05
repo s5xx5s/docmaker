@@ -5,6 +5,7 @@ import { ProjectPage } from './pages/ProjectPage';
 import { Editor } from './pages/Editor';
 import { Preview } from './pages/Preview';
 import { Settings } from './pages/Settings';
+import { useSettingsStore } from './store/settings.store';
 
 type Route =
   | { page: 'landing' }
@@ -19,6 +20,13 @@ const LAUNCHED_KEY = 'docmaker_launched';
 export default function App() {
   const hasLaunched = localStorage.getItem(LAUNCHED_KEY) === 'true';
   const [route, setRoute] = useState<Route>(hasLaunched ? { page: 'home' } : { page: 'landing' });
+  const uiLang = useSettingsStore(s => s.settings.uiLang);
+
+  // Apply RTL/LTR to the entire document based on UI language
+  useEffect(() => {
+    document.documentElement.dir = uiLang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = uiLang;
+  }, [uiLang]);
 
   // Once user dismisses landing, remember it
   useEffect(() => {

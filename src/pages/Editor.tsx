@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2, Palette, Languages, Download, AlignLeft, AlignRight } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2, Palette, Languages, Download, AlignLeft, AlignRight, Globe } from 'lucide-react';
 import { useProjectStore } from '../store/project.store';
 import { useThemeStore } from '../store/theme.store';
 import { SectionList, makeSectionFromTitle } from '../components/editor/SectionList';
@@ -12,6 +12,7 @@ import { ExportPanel } from '../components/export/ExportPanel';
 import type { Block, Guide, Section, Theme } from '../types';
 import { generateId } from '../utils/id';
 import { useT } from '../i18n';
+import { useSettingsStore } from '../store/settings.store';
 
 type SaveStatus = 'saved' | 'saving' | 'unsaved';
 type Device = 'desktop' | 'tablet' | 'mobile';
@@ -50,6 +51,7 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
   const [exportOpen, setExportOpen] = useState(false);
 
   const t = useT();
+  const { settings, updateSettings } = useSettingsStore();
 
   const activeSection = guide?.sections.find(s => s.id === activeSectionId) ?? null;
 
@@ -197,6 +199,15 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
         >
           {guide.direction === 'rtl' ? <AlignLeft size={14} /> : <AlignRight size={14} />}
           {guide.direction === 'rtl' ? t('ltr') : t('rtl')}
+        </button>
+        {/* UI Language toggle */}
+        <button
+          onClick={() => updateSettings({ uiLang: settings.uiLang === 'ar' ? 'en' : 'ar' })}
+          title={settings.uiLang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
+          className="flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5"
+        >
+          <Globe size={13} />
+          {settings.uiLang === 'ar' ? 'EN' : 'عربي'}
         </button>
         <button onClick={() => setTranslationOpen(true)} title={t('translate')} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
           <Languages size={14} /> {t('translate')}
