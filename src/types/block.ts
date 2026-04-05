@@ -11,6 +11,9 @@ interface BaseBlock {
   type: BlockType;
   blockAlign?: 'left' | 'center' | 'right';
   blockDir?: 'ltr' | 'rtl';
+  blockBold?: boolean;
+  blockItalic?: boolean;
+  blockFontSize?: 'xs' | 'sm' | 'base' | 'lg' | 'xl';
 }
 
 // ── الـ 12 الحالية ────────────────────────────────────────────────────────────
