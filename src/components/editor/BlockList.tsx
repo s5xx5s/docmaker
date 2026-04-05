@@ -11,6 +11,8 @@ import { getDefaultBlock } from '../blocks/defaultBlocks';
 
 interface Props {
   blocks: Block[];
+  editLang?: string;
+  isTranslation?: boolean;
   selectedBlockId: string | null;
   onSelect(id: string): void;
   onReorder(blocks: Block[]): void;
@@ -22,7 +24,7 @@ interface Props {
   onMoveDown(id: string): void;
 }
 
-export function BlockList({ blocks, selectedBlockId, onSelect, onReorder, onAdd, onUpdate, onDelete, onDuplicate, onMoveUp, onMoveDown }: Props) {
+export function BlockList({ blocks, editLang, isTranslation, selectedBlockId, onSelect, onReorder, onAdd, onUpdate, onDelete, onDuplicate, onMoveUp, onMoveDown }: Props) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -42,7 +44,14 @@ export function BlockList({ blocks, selectedBlockId, onSelect, onReorder, onAdd,
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 shrink-0">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Blocks</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Blocks</span>
+          {editLang && (
+            <span className={`text-xs px-1.5 py-0.5 rounded font-mono ${isTranslation ? 'bg-amber-900/50 text-amber-300' : 'bg-gray-800 text-gray-400'}`}>
+              {editLang.toUpperCase()}
+            </span>
+          )}
+        </div>
         <button onClick={() => setPickerOpen(true)} className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 border border-blue-800/50 rounded px-2 py-1">
           <Plus size={12} /> Add
         </button>

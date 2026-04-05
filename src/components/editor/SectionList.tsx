@@ -11,6 +11,7 @@ import { generateId } from '../../utils/id';
 interface Props {
   sections: Section[];
   activeSectionId: string | null;
+  editLang?: string;
   onSelect(id: string): void;
   onReorder(sections: Section[]): void;
   onAdd(): void;
@@ -19,7 +20,7 @@ interface Props {
   onRename(id: string, title: string): void;
 }
 
-export function SectionList({ sections, activeSectionId, onSelect, onReorder, onAdd, onDelete, onDuplicate, onRename }: Props) {
+export function SectionList({ sections, activeSectionId, editLang, onSelect, onReorder, onAdd, onDelete, onDuplicate, onRename }: Props) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   function handleDragEnd(event: DragEndEvent) {
@@ -55,6 +56,7 @@ export function SectionList({ sections, activeSectionId, onSelect, onReorder, on
                     key={section.id}
                     section={section}
                     isActive={section.id === activeSectionId}
+                    editLang={editLang}
                     onSelect={() => onSelect(section.id)}
                     onDelete={() => onDelete(section.id)}
                     onDuplicate={() => onDuplicate(section.id)}

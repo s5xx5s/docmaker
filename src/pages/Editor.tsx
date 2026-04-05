@@ -112,6 +112,21 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
 
   const activeSection = guide?.sections.find(s => s.id === activeSectionId) ?? null;
 
+  // ── Language-aware editing ────────────────────────────────────────────────
+  // If the UI lang matches one of the guide's available langs (and it's not the
+  // default), we edit the translated blocks/titles instead of the base ones.
+  const editLang = guide.availableLangs.some(l => l.code === settings.uiLang)
+    ? settings.uiLang
+    : guide.defaultLang;
+  const isTranslation = editLang !== guide.defaultLang;
+
+  // Blocks to display & edit in the blocks panel
+  const editingBlocks: import('../types').Block[] = activeSection
+    ? (isTranslation
+        ? (activeSection.translations[editLang]?.blocks ?? activeSection.blocks)
+        : activeSection.blocks)
+    : [];
+
   // Auto-save every 3 seconds when unsaved
   const persist = useCallback((g: Guide) => {
     setSaveStatus('saving');
@@ -229,7 +244,19 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
 
   function updateSectionBlocks(blocks: Block[]) {
     if (!activeSectionId) return;
-    mutate(g => ({ ...g, sections: g.sections.map(s => s.id === activeSectionId ? { ...s, blocks } : s) }));
+    if (isTranslation) {
+      // Write into the translation slot, not the base blocks
+      mutate(g => ({
+        ...g,
+        sections: g.sections.map(s =>
+          s.id === activeSectionId
+            ? { ...s, translations: { ...s.translations, [editLang]: { ...s.translations[editLang], blocks } } }
+            : s
+        ),
+      }));
+    } else {
+      mutate(g => ({ ...g, sections: g.sections.map(s => s.id === activeSectionId ? { ...s, blocks } : s) }));
+    }
   }
 
   function addBlock(block: Block) {
@@ -368,6 +395,7 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
           <SectionList
             sections={guide.sections}
             activeSectionId={activeSectionId}
+            editLang={editLang}
             onSelect={setActiveSectionId}
             onReorder={reorderSections}
             onAdd={addSection}
@@ -384,7 +412,9 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
         >
           {activeSection ? (
             <BlockList
-              blocks={activeSection.blocks}
+              blocks={editingBlocks}
+              editLang={editLang}
+              isTranslation={isTranslation}
               selectedBlockId={selectedBlockId}
               onSelect={setSelectedBlockId}
               onReorder={updateSectionBlocks}

@@ -6,13 +6,14 @@ import type { Section } from '../../types';
 interface Props {
   section: Section;
   isActive: boolean;
+  editLang?: string;
   onSelect(): void;
   onDelete(): void;
   onDuplicate(): void;
   onRename(title: string): void;
 }
 
-export function SectionItem({ section, isActive, onSelect, onDelete, onDuplicate, onRename }: Props) {
+export function SectionItem({ section, isActive, editLang, onSelect, onDelete, onDuplicate, onRename }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
 
   const style = {
@@ -39,20 +40,27 @@ export function SectionItem({ section, isActive, onSelect, onDelete, onDuplicate
         <GripVertical size={14} />
       </button>
 
-      <span className="flex-1 text-sm text-gray-200 truncate"
-        contentEditable
-        suppressContentEditableWarning
-        onBlur={(e) => {
-          const val = e.currentTarget.textContent?.trim();
-          if (val && val !== section.title) onRename(val);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); }
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {section.title}
-      </span>
+      {/* Show translated title when editing a non-default language; renaming always updates base title */}
+      {editLang && section.translations[editLang]?.title ? (
+        <span className="flex-1 text-sm text-gray-200 truncate" onClick={(e) => e.stopPropagation()}>
+          {section.translations[editLang]!.title}
+        </span>
+      ) : (
+        <span className="flex-1 text-sm text-gray-200 truncate"
+          contentEditable
+          suppressContentEditableWarning
+          onBlur={(e) => {
+            const val = e.currentTarget.textContent?.trim();
+            if (val && val !== section.title) onRename(val);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); }
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {section.title}
+        </span>
+      )}
 
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 shrink-0">
         <button onClick={(e) => { e.stopPropagation(); onDuplicate(); }} className="text-gray-500 hover:text-white p-0.5 rounded">
