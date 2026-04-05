@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Globe, Menu, X } from 'lucide-react';
+import { Globe, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Guide, Section, Theme } from '../../types';
 import { BlockRenderer } from '../blocks/BlockRenderer';
 import { useSettingsStore } from '../../store/settings.store';
@@ -71,20 +71,26 @@ interface Props {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function GuidePreview({ guide, theme, activeSectionId, onSectionChange, mode = 'inline', compact = false }: Props) {
-  const [lang, setLang] = useState<string>(guide.defaultLang);
+  const uiLang = useSettingsStore(s => s.settings.uiLang);
+
+  // Initialise lang from uiLang if guide supports it, otherwise fall back to guide default
+  const [lang, setLang] = useState<string>(() =>
+    guide.availableLangs.some(l => l.code === uiLang) ? uiLang : guide.defaultLang
+  );
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [containerWidth, setContainerWidth] = useState<number>(9999);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // ── Auto-sync guide language with UI language ──────────────────────────────
-  const uiLang = useSettingsStore(s => s.settings.uiLang);
+  // Runs when uiLang changes OR when a different guide is opened (guide.id changes).
   useEffect(() => {
-    // Switch preview language automatically when UI language changes,
-    // if the guide has a translation for that language.
     if (guide.availableLangs.some(l => l.code === uiLang)) {
       setLang(uiLang);
+    } else {
+      setLang(guide.defaultLang);
     }
-  }, [uiLang]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [uiLang, guide.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Responsive sidebar via ResizeObserver ──────────────────────────────────
   useEffect(() => {
@@ -126,13 +132,17 @@ export function GuidePreview({ guide, theme, activeSectionId, onSectionChange, m
   const hasMultipleLangs = guide.availableLangs.length > 1;
   const isRtl = (guide.direction ?? 'ltr') === 'rtl';
 
+  // Collapse/expand chevron respects text direction
+  const CollapseIcon  = isRtl ? ChevronRight : ChevronLeft;
+  const ExpandIcon    = isRtl ? ChevronLeft  : ChevronRight;
+
   const containerClass = mode === 'full'
     ? 'flex h-screen overflow-hidden'
     : 'flex h-full overflow-hidden rounded-xl border';
 
   // ── Sidebar inner (shared between static and overlay) ────────────────────
 
-  const SidebarInner = ({ showClose }: { showClose?: boolean }) => (
+  const SidebarInner = ({ showClose, showCollapse }: { showClose?: boolean; showCollapse?: boolean }) => (
     <>
       {/* Guide header */}
       <div
@@ -152,6 +162,7 @@ export function GuidePreview({ guide, theme, activeSectionId, onSectionChange, m
             {guide.title}
           </h2>
         </div>
+        {/* Drawer close button */}
         {showClose && (
           <button
             onClick={() => setDrawerOpen(false)}
@@ -159,6 +170,17 @@ export function GuidePreview({ guide, theme, activeSectionId, onSectionChange, m
             style={{ color: 'var(--gp-muted)' }}
           >
             <X size={16} />
+          </button>
+        )}
+        {/* Desktop/tablet collapse button */}
+        {showCollapse && (
+          <button
+            onClick={() => setSidebarCollapsed(true)}
+            title="Hide sidebar"
+            className="shrink-0 p-1 rounded-md hover:opacity-70 transition-opacity"
+            style={{ color: 'var(--gp-muted)' }}
+          >
+            <CollapseIcon size={16} />
           </button>
         )}
       </div>
@@ -221,12 +243,30 @@ export function GuidePreview({ guide, theme, activeSectionId, onSectionChange, m
 
       {/* ── Static sidebar (desktop / tablet) ────────────────────────── */}
       {hasSidebar && !useDrawer && (
-        <aside
-          className={`${sidebarWidth} shrink-0 flex flex-col border-e overflow-hidden`}
-          style={{ borderColor: 'var(--gp-border)', backgroundColor: 'var(--gp-surface)' }}
-        >
-          <SidebarInner />
-        </aside>
+        sidebarCollapsed ? (
+          /* Collapsed strip — just a narrow bar with expand button */
+          <aside
+            className="shrink-0 flex flex-col items-center pt-3 border-e"
+            style={{ width: '36px', borderColor: 'var(--gp-border)', backgroundColor: 'var(--gp-surface)' }}
+          >
+            <button
+              onClick={() => setSidebarCollapsed(false)}
+              title="Show sidebar"
+              className="p-1.5 rounded-md hover:opacity-70 transition-opacity"
+              style={{ color: 'var(--gp-muted)' }}
+            >
+              <ExpandIcon size={16} />
+            </button>
+          </aside>
+        ) : (
+          /* Full sidebar */
+          <aside
+            className={`${sidebarWidth} shrink-0 flex flex-col border-e overflow-hidden`}
+            style={{ borderColor: 'var(--gp-border)', backgroundColor: 'var(--gp-surface)' }}
+          >
+            <SidebarInner showCollapse />
+          </aside>
+        )
       )}
 
       {/* ── Main content ─────────────────────────────────────────────── */}
