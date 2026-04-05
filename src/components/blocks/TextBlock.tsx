@@ -6,8 +6,8 @@ export function TextBlock({ block, onUpdate, isEditing }: Props) {
   if (!isEditing) {
     return (
       <p
-        className="text-sm leading-relaxed whitespace-pre-wrap"
-        style={{ textAlign: block.align ?? 'left', color: 'var(--gp-text, #f1f5f9)' }}
+        className="leading-relaxed whitespace-pre-wrap"
+        style={{ textAlign: block.align ?? 'left', color: 'var(--gp-text, #f1f5f9)', fontSize: 'inherit' }}
       >
         {block.content}
       </p>

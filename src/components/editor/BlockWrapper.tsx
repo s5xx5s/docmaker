@@ -15,14 +15,6 @@ interface Props {
   children: React.ReactNode;
 }
 
-const FONT_SIZE_MAP: Record<string, string> = {
-  xs:   '0.75rem',
-  sm:   '0.875rem',
-  base: '1rem',
-  lg:   '1.125rem',
-  xl:   '1.25rem',
-};
-
 const FONT_SIZE_LABELS: Array<{ key: 'xs' | 'sm' | 'base' | 'lg' | 'xl'; label: string }> = [
   { key: 'xs',   label: 'XS' },
   { key: 'sm',   label: 'S'  },
@@ -46,16 +38,7 @@ export function BlockWrapper({ block, isSelected, onSelect, onDelete, onDuplicat
     onUpdate({ blockAlign: value, align: value } as Partial<Block>);
   }
 
-  // Wrapper-level styles (font props cascade to children; textAlign is fallback for blocks without own align)
-  const wrapperStyle: React.CSSProperties = {
-    direction:  block.blockDir,
-    fontWeight: block.blockBold   ? 'bold'   : undefined,
-    fontStyle:  block.blockItalic ? 'italic' : undefined,
-    fontSize:   block.blockFontSize ? FONT_SIZE_MAP[block.blockFontSize] : undefined,
-    // textAlign only needed for blocks that don't have their own align field;
-    // blocks like TextBlock override it internally anyway
-    textAlign:  block.blockAlign,
-  };
+  // No need to apply styles here — BlockRenderer handles them so they show in preview + export too
 
   return (
     <div
@@ -134,7 +117,7 @@ export function BlockWrapper({ block, isSelected, onSelect, onDelete, onDuplicat
       </div>
 
       {/* Block content */}
-      <div className="p-3" style={wrapperStyle}>
+      <div className="p-3">
         {children}
       </div>
     </div>
