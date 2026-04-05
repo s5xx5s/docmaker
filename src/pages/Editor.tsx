@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, Maximize2, Palette, Languages, Download, AlignLeft, AlignRight, Globe } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { ArrowLeft, Eye, EyeOff, Save, Monitor, Tablet, Smartphone, ExternalLink, Palette, Languages, Download, AlignLeft, AlignRight, Globe } from 'lucide-react';
+import { exportGuideAsHTML } from '../export/html';
 import { useProjectStore } from '../store/project.store';
 import { useThemeStore } from '../store/theme.store';
 import { SectionList, makeSectionFromTitle } from '../components/editor/SectionList';
@@ -30,7 +31,7 @@ interface Props {
   onFullPreview?(): void;
 }
 
-export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
+export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPreview }: Props) {
   const { projects, updateGuide } = useProjectStore();
   const { getTheme } = useThemeStore();
   const project = projects.find(p => p.id === projectId);
@@ -52,6 +53,46 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
 
   const t = useT();
   const { settings, updateSettings } = useSettingsStore();
+
+  // ── Resizable panels ──────────────────────────────────────────────────────
+  const [blockPanelWidth, setBlockPanelWidth] = useState(320);
+  const dragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragStartW = useRef(320);
+
+  const onDragStart = (e: React.MouseEvent) => {
+    dragging.current = true;
+    dragStartX.current = e.clientX;
+    dragStartW.current = blockPanelWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!dragging.current) return;
+      const delta = e.clientX - dragStartX.current;
+      setBlockPanelWidth(Math.max(240, Math.min(600, dragStartW.current + delta)));
+    };
+    const onUp = () => {
+      dragging.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+  }, []);
+
+  // ── Open preview in new tab ───────────────────────────────────────────────
+  function openPreviewNewTab() {
+    if (!guide) return;
+    const html = exportGuideAsHTML(guide, theme);
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
 
   const activeSection = guide?.sections.find(s => s.id === activeSectionId) ?? null;
 
@@ -219,11 +260,15 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
           {previewVisible ? <EyeOff size={14} /> : <Eye size={14} />}
           {previewVisible ? t('hidePreview') : t('preview')}
         </button>
-        {onFullPreview && (
-          <button onClick={onFullPreview} title="Full Screen Preview" className="text-gray-400 hover:text-white border border-gray-700 rounded-lg p-1.5">
-            <Maximize2 size={14} />
-          </button>
-        )}
+        {/* Open full preview in new tab */}
+        <button
+          onClick={openPreviewNewTab}
+          title={settings.uiLang === 'ar' ? 'فتح المعاينة في تاب جديد' : 'Open preview in new tab'}
+          className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 border border-blue-800 hover:border-blue-600 rounded-lg px-2 py-1.5 font-semibold"
+        >
+          <ExternalLink size={14} />
+          {settings.uiLang === 'ar' ? 'معاينة' : 'Preview'}
+        </button>
         <button onClick={() => setExportOpen(true)} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 rounded-lg px-2 py-1.5">
           <Download size={14} /> {t('export')}
         </button>
@@ -248,8 +293,11 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
           />
         </div>
 
-        {/* Blocks panel */}
-        <div className={`${previewVisible ? 'w-80 shrink-0' : 'flex-1'} border-r border-gray-800 overflow-hidden flex flex-col`}>
+        {/* Blocks panel — width controlled by drag handle */}
+        <div
+          className={`${previewVisible ? 'shrink-0' : 'flex-1'} border-r border-gray-800 overflow-hidden flex flex-col`}
+          style={previewVisible ? { width: blockPanelWidth } : undefined}
+        >
           {activeSection ? (
             <BlockList
               blocks={activeSection.blocks}
@@ -269,6 +317,17 @@ export function Editor({ projectId, guideId, onBack, onFullPreview }: Props) {
             </div>
           )}
         </div>
+
+        {/* Drag handle between blocks & preview */}
+        {previewVisible && (
+          <div
+            onMouseDown={onDragStart}
+            className="w-1.5 shrink-0 bg-gray-800 hover:bg-blue-600 cursor-col-resize transition-colors group flex items-center justify-center"
+            title="Drag to resize"
+          >
+            <div className="w-0.5 h-8 bg-gray-600 group-hover:bg-blue-400 rounded-full" />
+          </div>
+        )}
 
         {/* Preview panel */}
         {previewVisible && (
