@@ -3,6 +3,7 @@ import { useSettingsStore } from '../store/settings.store';
 import { useThemeStore } from '../store/theme.store';
 import { useProjectStore } from '../store/project.store';
 import { exportProjectsJSON } from '../utils/storage';
+import { clearIdbStorage } from '../utils/idb-storage';
 
 interface Props { onBack(): void }
 
@@ -31,8 +32,9 @@ export function Settings({ onBack }: Props) {
     } catch { return '?'; }
   })();
 
-  function clearAllData() {
+  async function clearAllData() {
     if (!confirm('Delete ALL projects, guides, and settings? This cannot be undone.')) return;
+    await clearIdbStorage();
     localStorage.clear();
     window.location.reload();
   }
@@ -133,7 +135,7 @@ export function Settings({ onBack }: Props) {
 
               {/* Stats */}
               <div className="px-5 py-4">
-                <p className="text-sm font-medium text-white mb-3">localStorage Usage</p>
+                <p className="text-sm font-medium text-white mb-3">IndexedDB Usage</p>
                 <div className="grid grid-cols-3 gap-3">
                   {[
                     { label: 'Projects', value: projects.length },
@@ -146,7 +148,7 @@ export function Settings({ onBack }: Props) {
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-gray-600 mt-3">Estimated size: {storageSize} KB</p>
+                <p className="text-xs text-gray-600 mt-3">Estimated JSON size: {storageSize} KB · Storage: IndexedDB (no 5 MB limit)</p>
               </div>
 
               {/* Export all */}
@@ -200,7 +202,7 @@ export function Settings({ onBack }: Props) {
               </div>
               <div className="flex items-center justify-between px-5 py-4">
                 <p className="text-sm text-gray-400">Storage</p>
-                <p className="text-sm text-white">localStorage (browser)</p>
+                <p className="text-sm text-white">IndexedDB (browser, 50 MB+)</p>
               </div>
               <div className="px-5 py-4">
                 <p className="text-sm text-gray-400 mb-2">Source</p>

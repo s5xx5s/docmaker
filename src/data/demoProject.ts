@@ -315,4 +315,7 @@ export const demoProject: Project = {
   guides:[demoGuide],
 };
 
+/** Legacy key (localStorage era) */
 export const DEMO_SEEDED_KEY = 'docmaker_demo_seeded';
+/** New key used by the IndexedDB era — ensures existing users see the demo once after migration */
+export const DEMO_SEEDED_KEY_V2 = 'docmaker_demo_seeded_v2';

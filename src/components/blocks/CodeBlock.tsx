@@ -14,7 +14,7 @@ export function CodeBlock({ block, onUpdate, isEditing }: Props) {
             {block.language && <span className="text-xs text-gray-600 font-mono ml-auto">{block.language}</span>}
           </div>
         )}
-        <pre className="text-green-300 font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap">
+        <pre className="text-green-300 font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre">
           {block.showLineNumbers
             ? block.code.split('\n').map((line, i) => (
                 <span key={i} className="block">

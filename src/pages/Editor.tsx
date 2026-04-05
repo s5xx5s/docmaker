@@ -423,6 +423,7 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
                 activeSectionId={activeSectionId}
                 onSectionChange={setActiveSectionId}
                 mode="inline"
+                compact={device === 'mobile'}
               />
             </div>
           </div>

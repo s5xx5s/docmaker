@@ -6,6 +6,8 @@ import { Editor } from './pages/Editor';
 import { Preview } from './pages/Preview';
 import { Settings } from './pages/Settings';
 import { useSettingsStore } from './store/settings.store';
+import { useProjectStore } from './store/project.store';
+import { useThemeStore } from './store/theme.store';
 
 type Route =
   | { page: 'landing' }
@@ -19,6 +21,12 @@ type Route =
 const LAUNCHED_KEY = 'docmaker_launched';
 
 export default function App() {
+  // Wait for all three IDB stores to finish loading
+  const projectsReady  = useProjectStore(s => s._hydrated);
+  const settingsReady  = useSettingsStore(s => s._hydrated);
+  const themesReady    = useThemeStore(s => s._hydrated);
+  const allReady       = projectsReady && settingsReady && themesReady;
+
   // sessionStorage resets every new tab/window — landing always shows first
   const hasLaunched = sessionStorage.getItem(LAUNCHED_KEY) === 'true';
   const [route, setRoute] = useState<Route>(hasLaunched ? { page: 'home' } : { page: 'landing' });
@@ -36,6 +44,26 @@ export default function App() {
       sessionStorage.setItem(LAUNCHED_KEY, 'true');
     }
   }, [route.page]);
+
+  // ── Loading screen while IDB reads complete ────────────────────────────────
+  if (!allReady) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center animate-pulse">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10,9 9,9 8,9"/>
+            </svg>
+          </div>
+          <p className="text-gray-500 text-xs">Loading your data…</p>
+        </div>
+      </div>
+    );
+  }
 
   // Navigate from landing → home
   function goHome() {

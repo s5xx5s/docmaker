@@ -66,6 +66,7 @@ export function Preview({ projectId, guideId, onBack }: Props) {
             guide={guide}
             theme={theme}
             mode="full"
+            compact={device === 'mobile'}
           />
         </div>
       </div>
