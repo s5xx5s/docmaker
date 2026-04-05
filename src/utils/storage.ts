@@ -1,21 +1,38 @@
+import LZString from 'lz-string';
 import type { Project } from '../types';
 
 const PROJECTS_KEY = 'docmaker_projects';
 const SETTINGS_KEY = 'docmaker_settings';
+
+// ── Compression helpers ────────────────────────────────────────────────────
+// LZString.compressToUTF16 stores compressed data as a UTF-16 string which
+// fits safely inside localStorage (avoids any UTF-8 encoding edge-cases).
+
+function compress(value: string): string {
+  return LZString.compressToUTF16(value);
+}
+
+/** Decompresses a value, falling back to plain JSON if it was stored without compression. */
+function decompress(raw: string): string {
+  const decompressed = LZString.decompressFromUTF16(raw);
+  // decompressFromUTF16 returns null when the input isn't LZ-compressed
+  return decompressed ?? raw;
+}
 
 // ── Projects ──────────────────────────────────────────────────────────────────
 
 export function loadProjects(): Project[] {
   try {
     const raw = localStorage.getItem(PROJECTS_KEY);
-    return raw ? (JSON.parse(raw) as Project[]) : [];
+    if (!raw) return [];
+    return JSON.parse(decompress(raw)) as Project[];
   } catch {
     return [];
   }
 }
 
 export function saveProjects(projects: Project[]): void {
-  localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+  localStorage.setItem(PROJECTS_KEY, compress(JSON.stringify(projects)));
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────────
@@ -23,19 +40,20 @@ export function saveProjects(projects: Project[]): void {
 export function loadSettings<T>(defaults: T): T {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    return raw ? { ...defaults, ...(JSON.parse(raw) as Partial<T>) } : defaults;
+    if (!raw) return defaults;
+    return { ...defaults, ...(JSON.parse(decompress(raw)) as Partial<T>) };
   } catch {
     return defaults;
   }
 }
 
 export function saveSettings<T>(settings: T): void {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  localStorage.setItem(SETTINGS_KEY, compress(JSON.stringify(settings)));
 }
 
 // ── Storage Usage ─────────────────────────────────────────────────────────────
 
-/** Returns total localStorage usage in KB */
+/** Returns total localStorage usage in KB (across all keys). */
 export function getStorageUsageKB(): number {
   let total = 0;
   for (const key in localStorage) {
