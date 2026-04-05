@@ -112,21 +112,6 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
 
   const activeSection = guide?.sections.find(s => s.id === activeSectionId) ?? null;
 
-  // ── Language-aware editing ────────────────────────────────────────────────
-  // If the UI lang matches one of the guide's available langs (and it's not the
-  // default), we edit the translated blocks/titles instead of the base ones.
-  const editLang = guide.availableLangs.some(l => l.code === settings.uiLang)
-    ? settings.uiLang
-    : guide.defaultLang;
-  const isTranslation = editLang !== guide.defaultLang;
-
-  // Blocks to display & edit in the blocks panel
-  const editingBlocks: import('../types').Block[] = activeSection
-    ? (isTranslation
-        ? (activeSection.translations[editLang]?.blocks ?? activeSection.blocks)
-        : activeSection.blocks)
-    : [];
-
   // Auto-save every 3 seconds when unsaved
   const persist = useCallback((g: Guide) => {
     setSaveStatus('saving');
@@ -170,6 +155,19 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
       <p className="text-gray-400">Guide not found</p>
     </div>
   );
+
+  // ── Language-aware editing (guide is non-null from here on) ───────────────
+  // editLang = UI language when it differs from the guide's default language.
+  // If the active section has no translated blocks for that lang, we fall back
+  // to the base blocks (but still mark isTranslation=true so adds/updates write
+  // into the translation slot, creating the translated block array on first edit).
+  const editLang = settings.uiLang;
+  const isTranslation = editLang !== guide.defaultLang;
+  const editingBlocks: Block[] = activeSection
+    ? (isTranslation && activeSection.translations[editLang]?.blocks != null
+        ? activeSection.translations[editLang]!.blocks
+        : activeSection.blocks)
+    : [];
 
   function mutate(updater: (g: Guide) => Guide) {
     setGuide(prev => {
@@ -260,33 +258,32 @@ export function Editor({ projectId, guideId, onBack, onFullPreview: _onFullPrevi
   }
 
   function addBlock(block: Block) {
-    updateSectionBlocks([...(activeSection?.blocks ?? []), block]);
+    updateSectionBlocks([...editingBlocks, block]);
     setSelectedBlockId(block.id);
   }
 
   function updateBlock(id: string, patch: Partial<Block>) {
-    updateSectionBlocks((activeSection?.blocks ?? []).map(b => b.id === id ? { ...b, ...patch } as Block : b));
+    updateSectionBlocks(editingBlocks.map(b => b.id === id ? { ...b, ...patch } as Block : b));
   }
 
   function deleteBlock(id: string) {
-    updateSectionBlocks((activeSection?.blocks ?? []).filter(b => b.id !== id));
+    updateSectionBlocks(editingBlocks.filter(b => b.id !== id));
     if (selectedBlockId === id) setSelectedBlockId(null);
   }
 
   function duplicateBlock(id: string) {
-    const blocks = activeSection?.blocks ?? [];
-    const original = blocks.find(b => b.id === id);
+    const original = editingBlocks.find(b => b.id === id);
     if (!original) return;
     const copy = { ...JSON.parse(JSON.stringify(original)) as Block, id: generateId() };
-    const idx = blocks.findIndex(b => b.id === id);
-    const newBlocks = [...blocks];
+    const idx = editingBlocks.findIndex(b => b.id === id);
+    const newBlocks = [...editingBlocks];
     newBlocks.splice(idx + 1, 0, copy);
     updateSectionBlocks(newBlocks);
     setSelectedBlockId(copy.id);
   }
 
   function moveBlock(id: string, dir: 'up' | 'down') {
-    const blocks = [...(activeSection?.blocks ?? [])];
+    const blocks = [...editingBlocks];
     const idx = blocks.findIndex(b => b.id === id);
     const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
     if (swapIdx < 0 || swapIdx >= blocks.length) return;

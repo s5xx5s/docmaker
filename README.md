@@ -33,7 +33,7 @@
 
 > بناء أدلة المستخدم الاحترافية في دقائق — بدون خادم أو حساب أو إنترنت
 
-Everything is stored in your browser's `localStorage`. Export your guides as a **standalone HTML file**, **Markdown**, **JSON**, or **PDF** — and share them anywhere.
+Everything is stored in your browser's **IndexedDB** (50 MB+). Export your guides as a **standalone HTML file**, **Markdown**, **JSON**, or **PDF** — and share them anywhere.
 
 ---
 
@@ -199,7 +199,7 @@ Custom themes are saved to `localStorage` and can be exported / imported as JSON
 | State management | Zustand 5 |
 | Drag & Drop | @dnd-kit/core + @dnd-kit/sortable |
 | Icons | lucide-react |
-| Storage | Browser `localStorage` |
+| Storage | Browser IndexedDB (via idb-keyval, 50 MB+) |
 | Deployment | GitHub Pages (GitHub Actions) |
 
 ---
@@ -241,6 +241,143 @@ npm run lint      # Run ESLint
 Push to `main` → GitHub Actions builds and deploys automatically.
 
 See [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)
+
+---
+
+## 🌐 Self-Hosting (Deploy to Your Own Server)
+
+docmaker is a **pure static app** (HTML + CSS + JS, no backend required).
+After building, deploy the `dist/` folder anywhere that serves static files.
+
+### Build for production
+
+```bash
+npm run build
+# Output: dist/
+```
+
+### Option 1 — Nginx
+
+```nginx
+server {
+    listen 80;
+    server_name docs.example.com;
+    root /var/www/docmaker/dist;
+    index index.html;
+
+    # Required for SPA routing
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    gzip on;
+    gzip_types text/plain text/css application/javascript application/json;
+}
+```
+
+```bash
+# Copy build output
+scp -r dist/ user@your-server:/var/www/docmaker/
+sudo systemctl reload nginx
+```
+
+### Option 2 — Docker
+
+```dockerfile
+FROM nginx:alpine
+COPY dist/ /usr/share/nginx/html/
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+```
+
+```bash
+docker build -t docmaker .
+docker run -p 80:80 docmaker
+```
+
+### Option 3 — Vercel / Netlify (one-click)
+
+| Platform | Steps |
+|----------|-------|
+| **Vercel** | Import repo → Framework: Vite → Deploy |
+| **Netlify** | Import repo → Build: `npm run build` → Publish: `dist` |
+| **Cloudflare Pages** | Connect repo → Build: `npm run build` → Output: `dist` |
+
+### Option 4 — Apache
+
+```apache
+<VirtualHost *:80>
+    DocumentRoot /var/www/docmaker/dist
+    <Directory /var/www/docmaker/dist>
+        Options -Indexes
+        FallbackResource /index.html
+    </Directory>
+</VirtualHost>
+```
+
+> **Note:** All user data stays in the **visitor's browser** (IndexedDB).
+> The server only serves static assets — no database, no backend, no user data ever touches the server.
+
+---
+
+## 👩‍💻 For Developers
+
+### Embed the live app in your docs site
+
+Since the export produces a **fully standalone HTML file**, you can:
+
+```html
+<!-- Embed a published guide as an iframe -->
+<iframe src="/guides/my-guide.html" width="100%" height="600" frameborder="0"></iframe>
+```
+
+### Use the JSON export in your own app
+
+```typescript
+// Import a docmaker JSON export
+import guideData from './my-guide.json';
+
+// guideData shape:
+{
+  id: string,
+  title: string,
+  sections: [{
+    id: string,
+    title: string,
+    blocks: Block[],              // 24 block types
+    translations: {               // optional multilingual content
+      ar: { title: string, blocks: Block[] },
+      fr: { title: string, blocks: Block[] },
+    }
+  }]
+}
+```
+
+### Add a custom block type
+
+1. Add the type definition to `src/types/block.ts`
+2. Create `src/components/blocks/MyBlock.tsx`
+3. Register it in `src/components/blocks/BlockRenderer.tsx`
+4. Add default data in `src/components/blocks/defaultBlocks.ts`
+5. Register it in `src/components/editor/BlockPicker.tsx`
+
+### Add a custom translation provider
+
+Add an entry in `src/providers/translation.ts` following the `TranslationProvider` interface:
+
+```typescript
+export const myProvider: TranslationProvider = {
+  name: 'My API',
+  translate: async (text, targetLang, apiKey) => {
+    const res = await fetch('https://api.example.com/translate', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({ text, target: targetLang }),
+    });
+    return (await res.json()).translation;
+  },
+};
+```
 
 ---
 
